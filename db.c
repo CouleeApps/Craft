@@ -164,7 +164,7 @@ void db_load_map(Map *map, int p, int q) {
         int y = sqlite3_column_int(update_chunk_stmt, 1);
         int z = sqlite3_column_int(update_chunk_stmt, 2);
         int w = sqlite3_column_int(update_chunk_stmt, 3);
-        map_set(map, x, y, z, w);
+        map_set(map, x, y, z, w, 0);
     }
 }
 

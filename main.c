@@ -685,7 +685,7 @@ void _set_block(
     if (chunk) {
         Map *map = &chunk->map;
         if (map_get(map, x, y, z) != w) {
-            map_set(map, x, y, z, w);
+            map_set(map, x, y, z, w, 0);
             chunk->dirty = 1;
         }
     }

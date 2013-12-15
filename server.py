@@ -1,5 +1,5 @@
 from contextlib import contextmanager
-from math import floor
+from math import floor, sqrt
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 import Queue
@@ -180,10 +180,38 @@ class Model(object):
             if max_rowid:
                 client.send(KEY, p, q, max_rowid)
     def on_block(self, client, x, y, z, w):
+        cx, cy, cz, crx, cry = map(float, client.position)
         x, y, z, w = map(int, (x, y, z, w))
+        p, q = chunked(x), chunked(z)
+
         if y <= 0 or y > 255 or w < 0 or w > 11:
             return
-        p, q = chunked(x), chunked(z)
+
+        print "client {0} is at {1}, {2}, {3}".format(client.nick, cx, cy, cz)
+        print "placing block at {0}, {1}, {2}".format(x, y, z)
+
+        dist = sqrt((cx-x)**2 + (cy-y)**2 + (cz-z)**2)
+
+        # Max dist of 8
+        if dist > 8:
+            with session() as sql:
+                query = (
+                    'select w, rowid from block where '
+                    'x = :x and y = :y and z = :z;'
+                )
+                block = sql.execute(query, dict(x=x, y=y, z=z))
+
+                for w, rowid in block:
+                    client.send(BLOCK, p, q, x, y, z, w)
+                    print w
+                    return
+
+            print -1
+            client.send(BLOCK, p, q, x, y, z, -1)
+            return
+
+        print "distance is {0}".format(dist)
+
         with session() as sql:
             query = (
                 'insert or replace into block (p, q, x, y, z, w) '

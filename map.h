@@ -23,12 +23,14 @@ typedef struct {
     unsigned int mask;
     unsigned int size;
     Entry *data;
+    Entry *orig;
 } Map;
 
 void map_alloc(Map *map);
 void map_free(Map *map);
 void map_grow(Map *map);
-void map_set(Map *map, int x, int y, int z, int w);
+void map_set(Map *map, int x, int y, int z, int w, int o);
 int map_get(Map *map, int x, int y, int z);
+int map_get_orig(Map *map, int x, int y, int z);
 
 #endif
