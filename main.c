@@ -1710,26 +1710,28 @@ int main(int argc, char **argv) {
                 int hw = hit_test(0, x, y, z, rx, ry,
                     &hx, &hy, &hz);
                 if (hy > 0 && hy < 256 && is_destructable(hw)) {
-                    if (is_selectable(hw)) {
-                        int slot = find_usable_inventory_slot(hw);
-
-                        if (slot != -1) {
-                            inventory.items[slot].w = hw;
-                            inventory.items[slot].count ++;
-                            db_set_slot(hw, slot, inventory.items[slot].count);
-                        }
-                    }
-
                     Entry block = get_block_entry(hx, hy, hz);
                     if (block.b == 8) {
                         set_block(hx, hy, hz, 0, 0);
+                        if (is_selectable(hw)) {
+
+                            int slot = find_usable_inventory_slot(hw);
+
+                            if (slot != -1) {
+                                inventory.items[slot].w = hw;
+                                inventory.items[slot].count ++;
+                                db_set_slot(hw, slot, inventory.items[slot].count);
+                            }
+                        }
 
                         int above = get_block(hx, hy + 1, hz);
                         if (is_plant(above)) {
                             set_block(hx, hy + 1, hz, 9, 0);
                         }
-                    } else
+                    } else {
                         set_block(hx, hy, hz, hw, block.b + 1);
+                        left_click = 1;
+                    }
                 }
             }
             if (right_click && exclusive) {
