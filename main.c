@@ -630,7 +630,7 @@ void gen_chunk_buffer(Chunk *chunk) {
         if (e->w <= 0) {
             continue;
         }
-        int f1, f2, f3, f4, f5, f6;
+        int f1 = 0, f2 = 0, f3 = 0, f4 = 0, f5 = 0, f6 = 0;
         exposed_faces(map, e->x, e->y, e->z, &f1, &f2, &f3, &f4, &f5, &f6);
         int total = f1 + f2 + f3 + f4 + f5 + f6;
         if (is_plant(e->w)) {
@@ -641,6 +641,11 @@ void gen_chunk_buffer(Chunk *chunk) {
         }
         faces += total;
     } END_MAP_FOR_EACH;
+
+    if (faces > 0x1000000) {
+        printf("PANIC MODE SET A BREAKPOINT\n");
+        return;
+    }
 
     GLfloat *data = malloc_faces(8, faces);
     int offset = 0;

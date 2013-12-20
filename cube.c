@@ -154,6 +154,8 @@ void make_cube(
     int left, int right, int top, int bottom, int front, int back,
     float x, float y, float z, float n, int w)
 {
+    if (data == NULL)
+        return;
     int wleft, wright, wtop, wbottom, wfront, wback;
     w--;
     wbottom = w;
@@ -171,6 +173,8 @@ void make_break(
     int left, int right, int top, int bottom, int front, int back,
     float x, float y, float z, float n, int w)
 {
+    if (data == NULL)
+        return;
     n += 0.01;
     int wleft, wright, wtop, wbottom, wfront, wback;
     w = 255 - (8 - w);
@@ -186,6 +190,8 @@ void make_plant(
     float *data,
     float px, float py, float pz, float n, int w, float rotation)
 {
+    if (data == NULL)
+        return;
     float *d = data;
     float s = 0.0625;
     float a = 0;
