@@ -103,6 +103,8 @@ static char typing_buffer[MAX_TEXT_LENGTH] = {0};
 static Inventory inventory;
 static int inventory_screen = 0;
 static int inventory_toggle = 0;
+static Entry breaking_block;
+static int breaking_start;
 
 int is_plant(int w) {
     return w > 16 && w < 1000;
@@ -772,7 +774,8 @@ void _set_block(int p, int q, int x, int y, int z, int w, int b) {
     Chunk *chunk = find_chunk(p, q);
     if (chunk) {
         Map *map = &chunk->map;
-        if (b != 0 || map_get(map, x, y, z) != w) {
+        Entry current = map_get_entry(map, x, y, z);
+        if (current.b != b || current.w != w) {
             map_set(map, x, y, z, w, b);
             chunk->dirty = 1;
         }
@@ -1191,6 +1194,10 @@ void on_scroll(GLFWwindow *window, double xdelta, double ydelta) {
 }
 
 void on_mouse_button(GLFWwindow *window, int button, int action, int mods) {
+    if (action == GLFW_RELEASE) {
+        if (button == GLFW_MOUSE_BUTTON_LEFT)
+            left_click = 0;
+    }
     if (action != GLFW_PRESS) {
         return;
     }
@@ -1702,13 +1709,15 @@ int main(int argc, char **argv) {
         if (!inventory_screen) {
             // HANDLE CLICKS //
             if (left_click && exclusive) {
-                left_click = 0;
+                //left_click = 0;
                 int hx, hy, hz;
                 int hw = hit_test(0, x, y, z, rx, ry,
                     &hx, &hy, &hz);
                 if (hy > 0 && hy < 256 && is_destructable(hw)) {
                     Entry block = get_block_entry(hx, hy, hz);
-                    if (block.b == 8) {
+                    if (++block.b > 8) {
+                        breaking_block.w = 0;
+
                         set_block(hx, hy, hz, 0, 0);
                         if (is_selectable(hw)) {
 
@@ -1726,10 +1735,21 @@ int main(int argc, char **argv) {
                             set_block(hx, hy + 1, hz, 9, 0);
                         }
                     } else {
-                        set_block(hx, hy, hz, hw, block.b + 1);
-                        left_click = 1;
+                        if (breaking_block.w != 0 && breaking_block.b <= 8 && !entry_compare(block, breaking_block)) {
+                            breaking_block.b = 0;
+                            set_block(breaking_block.x, breaking_block.y, breaking_block.z, breaking_block.w, 0);
+                        }
+                        set_block(hx, hy, hz, hw, block.b);
+                        breaking_block = block;
+                        //left_click = 1;
                     }
                 }
+            } else {
+                if (breaking_block.w != 0 && breaking_block.b <= 8) {
+                    breaking_block.b = 0;
+                    set_block(breaking_block.x, breaking_block.y, breaking_block.z, breaking_block.w, 0);
+                }
+                breaking_block.w = 0;
             }
             if (right_click && exclusive) {
                 right_click = 0;

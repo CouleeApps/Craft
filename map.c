@@ -71,6 +71,10 @@ int map_get(Map *map, int x, int y, int z) {
     return 0;
 }
 
+int entry_compare(Entry entry1, Entry entry2) {
+    return entry1.x == entry2.x && entry1.y == entry2.y && entry1.z == entry2.z;
+}
+
 Entry map_get_entry(Map *map, int x, int y, int z) {
     unsigned int index = hash(x, y, z) & map->mask;
     Entry *entry = map->data + index;
