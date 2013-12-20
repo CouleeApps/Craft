@@ -104,7 +104,7 @@ static Inventory inventory;
 static int inventory_screen = 0;
 static int inventory_toggle = 0;
 static Entry breaking_block;
-static struct timeval breaking_start;
+static double breaking_start;
 
 int is_plant(int w) {
     return block_type(w) == BlockRenderTypePlant;
@@ -1712,12 +1712,11 @@ int main(int argc, char **argv) {
                         set_block(breaking_block.x, breaking_block.y, breaking_block.z, breaking_block.w, 0);
                     }
                     if (breaking_block.w == 0 || breaking_block.b == 0)
-                        gettimeofday(&breaking_start, NULL);
+                        breaking_start = glfwGetTime();
 
-                    struct timeval current;
-                    gettimeofday(&current, NULL);
+                    double current = glfwGetTime();
 
-                    double elapsed = (current.tv_sec + (current.tv_usec * pow(10, -6))) - (breaking_start.tv_sec + (breaking_start.tv_usec * pow(10, -6)));
+                    double elapsed = (current - breaking_start);
 
                     int hb = MIN(9, 1 + MAX(0, (8 * elapsed / get_block(hw).break_duration)));
 
