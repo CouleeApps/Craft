@@ -53,6 +53,6 @@
 #define INVENTORY_FONT_SIZE 20
 #define INVENTORY_UNLIMITED 0x7fffffff
 
-#define CREATIVE_MODE 1
+#define CREATIVE_MODE 0
 
 #endif

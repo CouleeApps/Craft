@@ -104,32 +104,28 @@ static Inventory inventory;
 static int inventory_screen = 0;
 static int inventory_toggle = 0;
 static Entry breaking_block;
-static int breaking_start;
+static struct timeval breaking_start;
 
 int is_plant(int w) {
-    return w > 16 && w < 1000;
-}
-
-int is_break(int w) {
-    return w > 1000 && w < 1009;
+    return block_type(w) == BlockRenderTypePlant;
 }
 
 int is_obstacle(int w) {
     w = ABS(w);
-    return w > 0 && w < 16;
+    return block_type(w) == BlockRenderTypeBlock;
 }
 
 int is_transparent(int w) {
     w = ABS(w);
-    return w == 0 || w == 10 || w == 15 || is_plant(w) || is_break(w);
+    return block_transparent(w);
 }
 
 int is_destructable(int w) {
-    return w > 0 && w != 16 && !is_break(w);
+    return block_breakable(w);
 }
 
 int is_selectable(int w) {
-    return w > 0 && w <= 15;
+    return block_placeable(w);
 }
 
 int chunked(float x) {
@@ -802,17 +798,6 @@ void set_block(int x, int y, int z, int w, int b) {
     client_block(x, y, z, w, inventory.selected);
 }
 
-int get_block(int x, int y, int z) {
-    int p = chunked(x);
-    int q = chunked(z);
-    Chunk *chunk = find_chunk(p, q);
-    if (chunk) {
-        Map *map = &chunk->map;
-        return map_get(map, x, y, z);
-    }
-    return 0;
-}
-
 Entry get_block_entry(int x, int y, int z) {
     int p = chunked(x);
     int q = chunked(z);
@@ -1431,6 +1416,7 @@ int main(int argc, char **argv) {
         glfwTerminate();
         return -1;
     }
+    init_blocks();
     glfwMakeContextCurrent(window);
     glfwSwapInterval(VSYNC);
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
@@ -1709,13 +1695,29 @@ int main(int argc, char **argv) {
         if (!inventory_screen) {
             // HANDLE CLICKS //
             if (left_click && exclusive) {
-                //left_click = 0;
+                if (CREATIVE_MODE)
+                    left_click = 0;
                 int hx, hy, hz;
                 int hw = hit_test(0, x, y, z, rx, ry,
                     &hx, &hy, &hz);
                 if (hy > 0 && hy < 256 && is_destructable(hw)) {
                     Entry block = get_block_entry(hx, hy, hz);
-                    if (++block.b > 8) {
+                    if (breaking_block.w != 0 && breaking_block.b <= 8 && !entry_compare(block, breaking_block)) {
+                        breaking_block.b = 0;
+                        set_block(breaking_block.x, breaking_block.y, breaking_block.z, breaking_block.w, 0);
+                    }
+                    if (breaking_block.w == 0 || breaking_block.b == 0)
+                        gettimeofday(&breaking_start, NULL);
+
+                    struct timeval current;
+                    gettimeofday(&current, NULL);
+
+                    double elapsed = (current.tv_sec + (current.tv_usec * pow(10, -6))) - (breaking_start.tv_sec + (breaking_start.tv_usec * pow(10, -6)));
+
+                    printf("%f\n", elapsed);
+                    int hb = MIN(9, 1 + MAX(0, (8 * elapsed / get_block(hw).break_duration)));
+
+                    if (hb > 8 || CREATIVE_MODE || get_block(hw).break_duration == 0.0) {
                         breaking_block.w = 0;
 
                         set_block(hx, hy, hz, 0, 0);
@@ -1730,18 +1732,13 @@ int main(int argc, char **argv) {
                             }
                         }
 
-                        int above = get_block(hx, hy + 1, hz);
+                        int above = get_block_entry(hx, hy + 1, hz).w;
                         if (is_plant(above)) {
                             set_block(hx, hy + 1, hz, 9, 0);
                         }
                     } else {
-                        if (breaking_block.w != 0 && breaking_block.b <= 8 && !entry_compare(block, breaking_block)) {
-                            breaking_block.b = 0;
-                            set_block(breaking_block.x, breaking_block.y, breaking_block.z, breaking_block.w, 0);
-                        }
-                        set_block(hx, hy, hz, hw, block.b);
+                        set_block(hx, hy, hz, hw, hb);
                         breaking_block = block;
-                        //left_click = 1;
                     }
                 }
             } else {
