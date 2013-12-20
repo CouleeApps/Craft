@@ -117,7 +117,7 @@ int is_obstacle(int w) {
 
 int is_transparent(int w) {
     w = ABS(w);
-    return block_transparent(w);
+    return !!block_transparent(w);
 }
 
 int is_destructable(int w) {
@@ -1719,7 +1719,6 @@ int main(int argc, char **argv) {
 
                     double elapsed = (current.tv_sec + (current.tv_usec * pow(10, -6))) - (breaking_start.tv_sec + (breaking_start.tv_usec * pow(10, -6)));
 
-                    printf("%f\n", elapsed);
                     int hb = MIN(9, 1 + MAX(0, (8 * elapsed / get_block(hw).break_duration)));
 
                     if (hb > 8 || CREATIVE_MODE || get_block(hw).break_duration == 0.0) {
