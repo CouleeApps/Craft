@@ -112,7 +112,7 @@ int is_plant(int w) {
 
 int is_obstacle(int w) {
     w = ABS(w);
-    return block_type(w) == BlockRenderTypeBlock;
+    return block_solid(w);
 }
 
 int is_transparent(int w) {

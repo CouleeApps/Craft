@@ -39,6 +39,7 @@ typedef struct {
     int breakable;
     int placable;
     int transparent;
+    int solid;
     BlockRenderType type;
 } BlockType;
 
@@ -48,6 +49,7 @@ int block_breakable(int id);
 int block_placeable(int id);
 int block_transparent(int id);
 int block_type(int id);
+int block_solid(int id);
 
 void create_world(Map *map, int p, int q);
 

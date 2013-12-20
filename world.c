@@ -36,34 +36,34 @@ void init_blocks() {
     block_types = calloc(25, sizeof(BlockType));
     block_count = -1;
 
-// w = id, h = hardness, b = breakable, p = placeable, t = transparent, y = type
-//  block_types[block_count ++] = Block       = (BlockType){ w,   h, b, p, t, y                   };
-    block_types[block_count ++] = Unknown     = (BlockType){-1, 0.0, 0, 0, 1, BlockRenderTypeNone };
-    block_types[block_count ++] = Air         = (BlockType){ 0, 0.0, 0, 0, 1, BlockRenderTypeNone };
-    block_types[block_count ++] = Grass       = (BlockType){ 1, 0.5, 1, 1, 0, BlockRenderTypeBlock};
-    block_types[block_count ++] = Sand        = (BlockType){ 2, 0.5, 1, 1, 0, BlockRenderTypeBlock};
-    block_types[block_count ++] = Slab        = (BlockType){ 3, 2.0, 1, 1, 0, BlockRenderTypeBlock};
-    block_types[block_count ++] = Brick       = (BlockType){ 4, 3.0, 1, 1, 0, BlockRenderTypeBlock};
-    block_types[block_count ++] = Wood        = (BlockType){ 5, 1.5, 1, 1, 0, BlockRenderTypeBlock};
-    block_types[block_count ++] = Stone       = (BlockType){ 6, 3.0, 1, 1, 0, BlockRenderTypeBlock};
-    block_types[block_count ++] = Dirt        = (BlockType){ 7, 0.5, 1, 1, 0, BlockRenderTypeBlock};
-    block_types[block_count ++] = Plank       = (BlockType){ 8, 1.0, 1, 1, 0, BlockRenderTypeBlock};
-    block_types[block_count ++] = Snow        = (BlockType){ 9, 0.5, 1, 1, 0, BlockRenderTypeBlock};
-    block_types[block_count ++] = Glass       = (BlockType){10, 0.5, 1, 1, 1, BlockRenderTypeBlock};
-    block_types[block_count ++] = Cobblestone = (BlockType){11, 3.5, 1, 1, 0, BlockRenderTypeBlock};
-    block_types[block_count ++] = LightSlab   = (BlockType){12, 3.5, 1, 1, 0, BlockRenderTypeBlock};
-    block_types[block_count ++] = DarkSlab    = (BlockType){13, 3.5, 1, 1, 0, BlockRenderTypeBlock};
-    block_types[block_count ++] = WoodBox     = (BlockType){14, 1.5, 1, 1, 0, BlockRenderTypeBlock};
-    block_types[block_count ++] = Leaf        = (BlockType){15, 0.5, 1, 1, 1, BlockRenderTypeBlock};
-    block_types[block_count ++] = Cloud       = (BlockType){16, 0.0, 0, 0, 0, BlockRenderTypeBlock};
-    block_types[block_count ++] = TallGrass   = (BlockType){17, 0.0, 1, 1, 1, BlockRenderTypePlant};
-    block_types[block_count ++] = Flower1     = (BlockType){18, 0.0, 1, 1, 1, BlockRenderTypePlant};
-    block_types[block_count ++] = Flower2     = (BlockType){19, 0.0, 1, 1, 1, BlockRenderTypePlant};
-    block_types[block_count ++] = Flower3     = (BlockType){20, 0.0, 1, 1, 1, BlockRenderTypePlant};
-    block_types[block_count ++] = Flower4     = (BlockType){21, 0.0, 1, 1, 1, BlockRenderTypePlant};
-    block_types[block_count ++] = Flower5     = (BlockType){22, 0.0, 1, 1, 1, BlockRenderTypePlant};
-    block_types[block_count ++] = Flower6     = (BlockType){23, 0.0, 1, 1, 1, BlockRenderTypePlant};
-    block_types[block_count ++] = Flower7     = (BlockType){24, 0.0, 1, 1, 1, BlockRenderTypePlant};
+// w = id, h = hardness, b = breakable, p = placeable, t = transparent, s = solid, y = type
+//  block_types[block_count ++] = Block       = (BlockType){ w,   h, b, p, t, s, y                   };
+    block_types[block_count ++] = Unknown     = (BlockType){-1, 0.0, 0, 0, 1, 0, BlockRenderTypeNone };
+    block_types[block_count ++] = Air         = (BlockType){ 0, 0.0, 0, 0, 1, 0, BlockRenderTypeNone };
+    block_types[block_count ++] = Grass       = (BlockType){ 1, 0.5, 1, 1, 0, 1, BlockRenderTypeBlock};
+    block_types[block_count ++] = Sand        = (BlockType){ 2, 0.5, 1, 1, 0, 1, BlockRenderTypeBlock};
+    block_types[block_count ++] = Slab        = (BlockType){ 3, 2.0, 1, 1, 0, 1, BlockRenderTypeBlock};
+    block_types[block_count ++] = Brick       = (BlockType){ 4, 3.0, 1, 1, 0, 1, BlockRenderTypeBlock};
+    block_types[block_count ++] = Wood        = (BlockType){ 5, 1.5, 1, 1, 0, 1, BlockRenderTypeBlock};
+    block_types[block_count ++] = Stone       = (BlockType){ 6, 3.0, 1, 1, 0, 1, BlockRenderTypeBlock};
+    block_types[block_count ++] = Dirt        = (BlockType){ 7, 0.5, 1, 1, 0, 1, BlockRenderTypeBlock};
+    block_types[block_count ++] = Plank       = (BlockType){ 8, 1.0, 1, 1, 0, 1, BlockRenderTypeBlock};
+    block_types[block_count ++] = Snow        = (BlockType){ 9, 0.5, 1, 1, 0, 1, BlockRenderTypeBlock};
+    block_types[block_count ++] = Glass       = (BlockType){10, 0.5, 1, 1, 1, 1, BlockRenderTypeBlock};
+    block_types[block_count ++] = Cobblestone = (BlockType){11, 3.5, 1, 1, 0, 1, BlockRenderTypeBlock};
+    block_types[block_count ++] = LightSlab   = (BlockType){12, 3.5, 1, 1, 0, 1, BlockRenderTypeBlock};
+    block_types[block_count ++] = DarkSlab    = (BlockType){13, 3.5, 1, 1, 0, 1, BlockRenderTypeBlock};
+    block_types[block_count ++] = WoodBox     = (BlockType){14, 1.5, 1, 1, 0, 1, BlockRenderTypeBlock};
+    block_types[block_count ++] = Leaf        = (BlockType){15, 0.5, 1, 1, 1, 1, BlockRenderTypeBlock};
+    block_types[block_count ++] = Cloud       = (BlockType){16, 0.0, 0, 0, 1, 0, BlockRenderTypeBlock};
+    block_types[block_count ++] = TallGrass   = (BlockType){17, 0.0, 1, 1, 1, 0, BlockRenderTypePlant};
+    block_types[block_count ++] = Flower1     = (BlockType){18, 0.0, 1, 1, 1, 0, BlockRenderTypePlant};
+    block_types[block_count ++] = Flower2     = (BlockType){19, 0.0, 1, 1, 1, 0, BlockRenderTypePlant};
+    block_types[block_count ++] = Flower3     = (BlockType){20, 0.0, 1, 1, 1, 0, BlockRenderTypePlant};
+    block_types[block_count ++] = Flower4     = (BlockType){21, 0.0, 1, 1, 1, 0, BlockRenderTypePlant};
+    block_types[block_count ++] = Flower5     = (BlockType){22, 0.0, 1, 1, 1, 0, BlockRenderTypePlant};
+    block_types[block_count ++] = Flower6     = (BlockType){23, 0.0, 1, 1, 1, 0, BlockRenderTypePlant};
+    block_types[block_count ++] = Flower7     = (BlockType){24, 0.0, 1, 1, 1, 0, BlockRenderTypePlant};
 }
 
 BlockType get_block(int id) {
@@ -84,6 +84,10 @@ int block_transparent(int id) {
 
 int block_type(int id) {
     return get_block(id).type;
+}
+
+int block_solid(int id) {
+    return get_block(id).solid;
 }
 
 void create_world(Map *map, int p, int q) {
