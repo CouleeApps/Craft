@@ -1566,10 +1566,7 @@ int main(int argc, char **argv) {
 
     for (int item = 0; item < INVENTORY_SLOTS * INVENTORY_ROWS; item ++) {
         if (CREATIVE_MODE) {
-            if (is_break(item + 1001)) {
-                inventory.items[item].count = INVENTORY_UNLIMITED;
-                inventory.items[item].w = item + 1001;
-            } else if (is_selectable(item + 1)) {
+            if (is_selectable(item + 1)) {
                 inventory.items[item].count = INVENTORY_UNLIMITED;
                 inventory.items[item].w = item + 1;
             } else {
