@@ -166,6 +166,22 @@ void make_cube(
         x, y, z, n);
 }
 
+void make_break(
+    float *data,
+    int left, int right, int top, int bottom, int front, int back,
+    float x, float y, float z, float n, int w)
+{
+    n += 0.01;
+    int wleft, wright, wtop, wbottom, wfront, wback;
+    w = 255 - (8 - w);
+    wbottom = wtop = wleft = wright = wfront = wback = w;
+    make_cube_faces(
+                    data,
+                    left, right, top, bottom, front, back,
+                    wleft, wright, wtop, wbottom, wfront, wback,
+                    x, y, z, n);
+}
+
 void make_plant(
     float *data,
     float px, float py, float pz, float n, int w, float rotation)

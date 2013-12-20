@@ -12,6 +12,11 @@ void make_cube(
     int left, int right, int top, int bottom, int front, int back,
     float x, float y, float z, float n, int w);
 
+void make_break(
+    float *data,
+    int left, int right, int top, int bottom, int front, int back,
+    float x, float y, float z, float n, int w);
+
 void make_plant(
     float *data,
     float px, float py, float pz, float n, int w, float rotation);

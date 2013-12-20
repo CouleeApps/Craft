@@ -105,7 +105,11 @@ static int inventory_screen = 0;
 static int inventory_toggle = 0;
 
 int is_plant(int w) {
-    return w > 16;
+    return w > 16 && w < 1000;
+}
+
+int is_break(int w) {
+    return w > 1000 && w < 1009;
 }
 
 int is_obstacle(int w) {
@@ -115,11 +119,11 @@ int is_obstacle(int w) {
 
 int is_transparent(int w) {
     w = ABS(w);
-    return w == 0 || w == 10 || w == 15 || is_plant(w);
+    return w == 0 || w == 10 || w == 15 || is_plant(w) || is_break(w);
 }
 
 int is_destructable(int w) {
-    return w > 0 && w != 16;
+    return w > 0 && w != 16 && !is_break(w);
 }
 
 int is_selectable(int w) {
@@ -634,6 +638,9 @@ void gen_chunk_buffer(Chunk *chunk) {
         if (is_plant(e->w)) {
             total = total ? 4 : 0;
         }
+        if (e->b > 0) {
+            total *= 2;
+        }
         faces += total;
     } END_MAP_FOR_EACH;
 
@@ -663,6 +670,14 @@ void gen_chunk_buffer(Chunk *chunk) {
                 data + offset,
                 f1, f2, f3, f4, f5, f6,
                 e->x, e->y, e->z, 0.5, e->w);
+            
+            if (e->b > 0) {
+                offset += total * 48;
+                make_break(
+                    data + offset,
+                    f1, f2, f3, f4, f5, f6,
+                    e->x, e->y, e->z, 0.5, e->b);
+            }
         }
         offset += total * 48;
     } END_MAP_FOR_EACH;
@@ -753,33 +768,33 @@ void ensure_chunks(float x, float y, float z, int force) {
     chunk_count = count;
 }
 
-void _set_block(int p, int q, int x, int y, int z, int w) {
+void _set_block(int p, int q, int x, int y, int z, int w, int b) {
     Chunk *chunk = find_chunk(p, q);
     if (chunk) {
         Map *map = &chunk->map;
-        if (map_get(map, x, y, z) != w) {
-            map_set(map, x, y, z, w);
+        if (b != 0 || map_get(map, x, y, z) != w) {
+            map_set(map, x, y, z, w, b);
             chunk->dirty = 1;
         }
     }
     db_insert_block(p, q, x, y, z, w);
 }
 
-void set_block(int x, int y, int z, int w) {
+void set_block(int x, int y, int z, int w, int b) {
     int p = chunked(x);
     int q = chunked(z);
-    _set_block(p, q, x, y, z, w);
+    _set_block(p, q, x, y, z, w, b);
     if (chunked(x - 1) != p) {
-        _set_block(p - 1, q, x, y, z, -w);
+        _set_block(p - 1, q, x, y, z, -w, b);
     }
     if (chunked(x + 1) != p) {
-        _set_block(p + 1, q, x, y, z, -w);
+        _set_block(p + 1, q, x, y, z, -w, b);
     }
     if (chunked(z - 1) != q) {
-        _set_block(p, q - 1, x, y, z, -w);
+        _set_block(p, q - 1, x, y, z, -w, b);
     }
     if (chunked(z + 1) != q) {
-        _set_block(p, q + 1, x, y, z, -w);
+        _set_block(p, q + 1, x, y, z, -w, b);
     }
     client_block(x, y, z, w, inventory.selected);
 }
@@ -793,6 +808,23 @@ int get_block(int x, int y, int z) {
         return map_get(map, x, y, z);
     }
     return 0;
+}
+
+Entry get_block_entry(int x, int y, int z) {
+    int p = chunked(x);
+    int q = chunked(z);
+    Chunk *chunk = find_chunk(p, q);
+    if (chunk) {
+        Map *map = &chunk->map;
+        return map_get_entry(map, x, y, z);
+    }
+    Entry ret;
+    ret.x = 0;
+    ret.y = 0;
+    ret.z = 0;
+    ret.w = 0;
+    ret.b = 0;
+    return ret;
 }
 
 int render_chunks(Attrib *attrib, Player *player) {
@@ -1534,7 +1566,10 @@ int main(int argc, char **argv) {
 
     for (int item = 0; item < INVENTORY_SLOTS * INVENTORY_ROWS; item ++) {
         if (CREATIVE_MODE) {
-            if (is_selectable(item + 1)) {
+            if (is_break(item + 1001)) {
+                inventory.items[item].count = INVENTORY_UNLIMITED;
+                inventory.items[item].w = item + 1001;
+            } else if (is_selectable(item + 1)) {
                 inventory.items[item].count = INVENTORY_UNLIMITED;
                 inventory.items[item].w = item + 1;
             } else {
@@ -1685,11 +1720,16 @@ int main(int argc, char **argv) {
                         }
                     }
 
-                    set_block(hx, hy, hz, 0);
-                    int above = get_block(hx, hy + 1, hz);
-                    if (is_plant(above)) {
-                        set_block(hx, hy + 1, hz, 0);
-                    }
+                    Entry block = get_block_entry(hx, hy, hz);
+                    if (block.b == 8) {
+                        set_block(hx, hy, hz, 0, 0);
+
+                        int above = get_block(hx, hy + 1, hz);
+                        if (is_plant(above)) {
+                            set_block(hx, hy + 1, hz, 9, 0);
+                        }
+                    } else
+                        set_block(hx, hy, hz, hw, block.b + 1);
                 }
             }
             if (right_click && exclusive) {
@@ -1701,7 +1741,7 @@ int main(int argc, char **argv) {
                     if (get_current_count() > 0 &&
                         !player_intersects_block(2, x, y, z, hx, hy, hz)) {
 
-                        set_block(hx, hy, hz, get_current_block());
+                        set_block(hx, hy, hz, get_current_block(), 0);
 
                         if (get_current_count() != INVENTORY_UNLIMITED) {
                             inventory.items[inventory.selected].count --;
@@ -1787,7 +1827,7 @@ int main(int argc, char **argv) {
             if (sscanf(buffer, "B,%d,%d,%d,%d,%d,%d",
                 &bp, &bq, &bx, &by, &bz, &bw) == 6)
             {
-                _set_block(bp, bq, bx, by, bz, bw);
+                _set_block(bp, bq, bx, by, bz, bw, 0);
                 if (player_intersects_block(2, x, y, z, bx, by, bz)) {
                     y = highest_block(x, z) + 2;
                 }

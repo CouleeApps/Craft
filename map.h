@@ -17,6 +17,7 @@ typedef struct {
     int y;
     int z;
     int w;
+    int b;
 } Entry;
 
 typedef struct {
@@ -28,7 +29,8 @@ typedef struct {
 void map_alloc(Map *map);
 void map_free(Map *map);
 void map_grow(Map *map);
-void map_set(Map *map, int x, int y, int z, int w);
+void map_set(Map *map, int x, int y, int z, int w, int b);
 int map_get(Map *map, int x, int y, int z);
+Entry map_get_entry(Map *map, int x, int y, int z);
 
 #endif

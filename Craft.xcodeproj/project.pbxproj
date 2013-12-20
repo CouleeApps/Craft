@@ -257,6 +257,7 @@
 		B58A769A185EC31600655BD9 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
 		B58A769C185EC31A00655BD9 /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = System/Library/Frameworks/OpenGL.framework; sourceTree = SDKROOT; };
 		B58A76A0185EC34400655BD9 /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = System/Library/Frameworks/IOKit.framework; sourceTree = SDKROOT; };
+		B5A6109818641568000BBAB1 /* sky.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = sky.png; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -595,6 +596,7 @@
 				B58A7596185EBF8100655BD9 /* font.png */,
 				B58A7626185EBF8100655BD9 /* texture.png */,
 				B537CD5C185ED0B800B652DD /* inventory.png */,
+				B5A6109818641568000BBAB1 /* sky.png */,
 			);
 			name = Resources;
 			sourceTree = "<group>";
