@@ -67,6 +67,9 @@ void init_blocks() {
 }
 
 BlockType get_block(int id) {
+    BlockType blank;
+    if (id > block_count)
+        return blank;
     return block_types[id];
 }
 

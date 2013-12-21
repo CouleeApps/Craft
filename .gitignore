@@ -11,3 +11,6 @@ Craft.build
 *.a
 usr
 xcuserdata
+*.orig
+*.pyc
+Info.plist
