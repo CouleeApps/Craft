@@ -19,6 +19,7 @@
 #include "noise.h"
 #include "util.h"
 #include "world.h"
+#include "item.h"
 
 #define MAX_CHUNKS 1024
 #define MAX_PLAYERS 128
@@ -106,32 +107,6 @@ static int inventory_screen = 0;
 static int inventory_toggle = 0;
 static Entry breaking_block;
 static double breaking_start;
-
-int is_plant(int w) {
-    return item_type(w) == ItemRenderTypePlant;
-}
-
-int is_item(int w) {
-    return item_type(w) == ItemRenderTypeItem;
-}
-
-int is_obstacle(int w) {
-    w = ABS(w);
-    return item_solid(w);
-}
-
-int is_transparent(int w) {
-    w = ABS(w);
-    return !!item_transparent(w);
-}
-
-int is_destructable(int w) {
-    return item_breakable(w);
-}
-
-int is_selectable(int w) {
-    return item_placeable(w);
-}
 
 int chunked(float x) {
     return floorf(roundf(x) / CHUNK_SIZE);

@@ -58,6 +58,7 @@
 		B58A769E185EC32A00655BD9 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B58A769C185EC31A00655BD9 /* OpenGL.framework */; };
 		B58A769F185EC32F00655BD9 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B58A769A185EC31600655BD9 /* Cocoa.framework */; };
 		B58A76A1185EC34400655BD9 /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B58A76A0185EC34400655BD9 /* IOKit.framework */; };
+		B5DD996C1866B54300634CC0 /* item.c in Sources */ = {isa = PBXBuildFile; fileRef = B5DD996B1866B54300634CC0 /* item.c */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -261,6 +262,8 @@
 		B58A769C185EC31A00655BD9 /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = System/Library/Frameworks/OpenGL.framework; sourceTree = SDKROOT; };
 		B58A76A0185EC34400655BD9 /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = System/Library/Frameworks/IOKit.framework; sourceTree = SDKROOT; };
 		B5A6109818641568000BBAB1 /* sky.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = sky.png; sourceTree = "<group>"; };
+		B5DD996B1866B54300634CC0 /* item.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = item.c; sourceTree = "<group>"; };
+		B5DD996D1866B55000634CC0 /* item.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = item.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -562,6 +565,8 @@
 				B58A7593185EBF8100655BD9 /* cube.h */,
 				B58A7594185EBF8100655BD9 /* db.c */,
 				B58A7595185EBF8100655BD9 /* db.h */,
+				B5DD996B1866B54300634CC0 /* item.c */,
+				B5DD996D1866B55000634CC0 /* item.h */,
 				B58A7613185EBF8100655BD9 /* map.c */,
 				B58A7614185EBF8100655BD9 /* map.h */,
 				B58A7615185EBF8100655BD9 /* matrix.c */,
@@ -796,6 +801,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B5DD996C1866B54300634CC0 /* item.c in Sources */,
 				B58A7649185EC12A00655BD9 /* main.c in Sources */,
 				B58A7641185EC09D00655BD9 /* client.c in Sources */,
 				B58A7642185EC09D00655BD9 /* cube.c in Sources */,
