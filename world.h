@@ -38,10 +38,14 @@ typedef enum {
     ItemMaterialTypeNone,
     ItemMaterialTypeSoil,
     ItemMaterialTypeStone,
+    ItemMaterialTypeWood,
+    ItemMaterialTypePlant,
 } ItemMaterialType;
 
 typedef struct {
     int id;
+    int drops;
+    int drop_count;
     float break_duration;
     int breakable;
     int placable;
@@ -57,6 +61,8 @@ typedef struct {
 
 void init_items();
 ItemType get_item(int id);
+int item_drop(int id);
+int item_drop_count(int id);
 int item_breakable(int id);
 int item_placeable(int id);
 int item_transparent(int id);

@@ -1614,7 +1614,7 @@ int main(int argc, char **argv) {
         y = highest_block(x, z) + 2;
     }
 
-    int has_pick = 0;
+    int has_pick = 0, has_shovel = 0, has_axe = 0, has_sword = 0;
 
     for (int item = 0; item < INVENTORY_SLOTS * INVENTORY_ROWS; item ++) {
         if (CREATIVE_MODE) {
@@ -1636,11 +1636,38 @@ int main(int argc, char **argv) {
         }
         if (inventory.items[item].w == 256)
             has_pick = 1;
+        if (inventory.items[item].w == 257)
+            has_shovel = 1;
+        if (inventory.items[item].w == 258)
+            has_axe = 1;
+        if (inventory.items[item].w == 25)
+            has_sword = 1;
     }
     if (!has_pick) {
         int slot = find_usable_inventory_slot(256);
         if (slot != -1) {
             inventory.items[slot].w = 256;
+            inventory.items[slot].count = 1;
+        }
+    }
+    if (!has_shovel) {
+        int slot = find_usable_inventory_slot(257);
+        if (slot != -1) {
+            inventory.items[slot].w = 257;
+            inventory.items[slot].count = 1;
+        }
+    }
+    if (!has_axe) {
+        int slot = find_usable_inventory_slot(258);
+        if (slot != -1) {
+            inventory.items[slot].w = 258;
+            inventory.items[slot].count = 1;
+        }
+    }
+    if (!has_sword) {
+        int slot = find_usable_inventory_slot(259);
+        if (slot != -1) {
+            inventory.items[slot].w = 259;
             inventory.items[slot].count = 1;
         }
     }
@@ -1790,13 +1817,15 @@ int main(int argc, char **argv) {
 
                         set_block(hx, hy, hz, 0, 0);
                         if (is_selectable(hw)) {
+                            int dw = item_drop(hw);
+                            int dc = item_drop_count(hw);
 
-                            int slot = find_usable_inventory_slot(hw);
+                            int slot = find_usable_inventory_slot(dw);
 
                             if (slot != -1) {
-                                inventory.items[slot].w = hw;
-                                inventory.items[slot].count ++;
-                                db_set_slot(hw, slot, inventory.items[slot].count);
+                                inventory.items[slot].w = dw;
+                                inventory.items[slot].count += dc;
+                                db_set_slot(dw, slot, inventory.items[slot].count);
                             }
                         }
 
