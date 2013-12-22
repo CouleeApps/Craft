@@ -48,7 +48,7 @@ static ItemType Pickaxe;
 static ItemType *item_types;
 static int item_count;
 
-void init_blocks() {
+void init_items() {
     item_types = calloc(1024, sizeof(ItemType));
     item_count = -1;
 

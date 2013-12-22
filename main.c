@@ -1456,7 +1456,7 @@ int main(int argc, char **argv) {
         glfwTerminate();
         return -1;
     }
-    init_blocks();
+    init_items();
     glfwMakeContextCurrent(window);
     glfwSwapInterval(VSYNC);
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
