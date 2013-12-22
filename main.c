@@ -1614,6 +1614,8 @@ int main(int argc, char **argv) {
         y = highest_block(x, z) + 2;
     }
 
+    int has_pick = 0;
+
     for (int item = 0; item < INVENTORY_SLOTS * INVENTORY_ROWS; item ++) {
         if (CREATIVE_MODE) {
             if (is_selectable(item + 1)) {
@@ -1631,6 +1633,15 @@ int main(int argc, char **argv) {
         if (inventory.items[item].count <= 0) {
             inventory.items[item].count = 0;
             inventory.items[item].w = 0;
+        }
+        if (inventory.items[item].w == 256)
+            has_pick = 1;
+    }
+    if (!has_pick) {
+        int slot = find_usable_inventory_slot(256);
+        if (slot != -1) {
+            inventory.items[slot].w = 256;
+            inventory.items[slot].count = 1;
         }
     }
 
