@@ -28,10 +28,17 @@
 //Flower7
 
 typedef enum {
-    BlockRenderTypeNone,
-    BlockRenderTypeBlock,
-    BlockRenderTypePlant
-} BlockRenderType;
+    ItemRenderTypeNone,
+    ItemRenderTypeBlock,
+    ItemRenderTypePlant,
+    ItemRenderTypeItem,
+} ItemRenderType;
+
+typedef enum {
+    ItemMaterialTypeNone,
+    ItemMaterialTypeSoil,
+    ItemMaterialTypeStone,
+} ItemMaterialType;
 
 typedef struct {
     int id;
@@ -40,16 +47,24 @@ typedef struct {
     int placable;
     int transparent;
     int solid;
-    BlockRenderType type;
-} BlockType;
+    int max_quantity;
+    ItemMaterialType material;
+    ItemMaterialType *affects;
+    double *affections;
+    int affection_count;
+    ItemRenderType type;
+} ItemType;
 
-void init_blocks();
-BlockType get_block(int id);
-int block_breakable(int id);
-int block_placeable(int id);
-int block_transparent(int id);
-int block_type(int id);
-int block_solid(int id);
+void init_items();
+ItemType get_item(int id);
+int item_breakable(int id);
+int item_placeable(int id);
+int item_transparent(int id);
+int item_type(int id);
+int item_solid(int id);
+int item_max_quantity(int id);
+double item_affection(int item_id, ItemMaterialType material);
+double item_affection_id(int item_id, int affected_id);
 
 void create_world(Map *map, int p, int q);
 

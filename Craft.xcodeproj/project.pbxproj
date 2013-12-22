@@ -118,6 +118,9 @@
 		B537CD5C185ED0B800B652DD /* inventory.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = inventory.png; sourceTree = "<group>"; };
 		B537CD5D185ED15300B652DD /* inventory_fragment.glsl */ = {isa = PBXFileReference; lastKnownFileType = text; path = inventory_fragment.glsl; sourceTree = "<group>"; };
 		B537CD5E185ED15300B652DD /* inventory_vertex.glsl */ = {isa = PBXFileReference; lastKnownFileType = text; path = inventory_vertex.glsl; sourceTree = "<group>"; };
+		B555C4E618666E750012C98A /* item.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = item.png; sourceTree = "<group>"; };
+		B555C4E718666EDF0012C98A /* item_fragment.glsl */ = {isa = PBXFileReference; lastKnownFileType = text; path = item_fragment.glsl; sourceTree = "<group>"; };
+		B555C4E818666EDF0012C98A /* item_vertex.glsl */ = {isa = PBXFileReference; lastKnownFileType = text; path = item_vertex.glsl; sourceTree = "<group>"; };
 		B562E82A1862CFE200299FF6 /* maps.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = maps.py; sourceTree = "<group>"; };
 		B58A758E185EBF8100655BD9 /* builder.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = builder.py; sourceTree = "<group>"; };
 		B58A758F185EBF8100655BD9 /* client.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = client.c; sourceTree = "<group>"; };
@@ -508,6 +511,8 @@
 				B58A761C185EBF8100655BD9 /* block_vertex.glsl */,
 				B537CD5D185ED15300B652DD /* inventory_fragment.glsl */,
 				B537CD5E185ED15300B652DD /* inventory_vertex.glsl */,
+				B555C4E718666EDF0012C98A /* item_fragment.glsl */,
+				B555C4E818666EDF0012C98A /* item_vertex.glsl */,
 				B58A761D185EBF8100655BD9 /* line_fragment.glsl */,
 				B58A761E185EBF8100655BD9 /* line_vertex.glsl */,
 				B58A761F185EBF8100655BD9 /* text_fragment.glsl */,
@@ -593,6 +598,7 @@
 		B58A7632185EC05600655BD9 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				B555C4E618666E750012C98A /* item.png */,
 				B58A7596185EBF8100655BD9 /* font.png */,
 				B58A7626185EBF8100655BD9 /* texture.png */,
 				B537CD5C185ED0B800B652DD /* inventory.png */,

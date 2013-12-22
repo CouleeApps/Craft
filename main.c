@@ -41,6 +41,7 @@ static Texture BlockTexture     = {0, GL_TEXTURE0};
 static Texture FontTexture      = {1, GL_TEXTURE1};
 static Texture InventoryTexture = {2, GL_TEXTURE2};
 static Texture SkyTexture       = {3, GL_TEXTURE3};
+static Texture ItemTexture      = {4, GL_TEXTURE4};
 
 typedef struct {
     Map map;
@@ -107,25 +108,29 @@ static Entry breaking_block;
 static double breaking_start;
 
 int is_plant(int w) {
-    return block_type(w) == BlockRenderTypePlant;
+    return item_type(w) == ItemRenderTypePlant;
+}
+
+int is_item(int w) {
+    return item_type(w) == ItemRenderTypeItem;
 }
 
 int is_obstacle(int w) {
     w = ABS(w);
-    return block_solid(w);
+    return item_solid(w);
 }
 
 int is_transparent(int w) {
     w = ABS(w);
-    return !!block_transparent(w);
+    return !!item_transparent(w);
 }
 
 int is_destructable(int w) {
-    return block_breakable(w);
+    return item_breakable(w);
 }
 
 int is_selectable(int w) {
-    return block_placeable(w);
+    return item_placeable(w);
 }
 
 int chunked(float x) {
@@ -212,6 +217,12 @@ GLuint gen_plant_buffer(float x, float y, float z, float n, int w) {
     return gen_faces(8, 4, data);
 }
 
+GLuint gen_item_buffer(float x, float y, float n, int w) {
+    GLfloat *data = malloc_faces(4, 1);
+    make_item(data, x, y, n / 2, n, w);
+    return gen_faces(4, 1, data);
+}
+
 GLuint gen_player_buffer(float x, float y, float z, float rx, float ry) {
     GLfloat *data = malloc_faces(8, 6);
     make_player(data, x, y, z, rx, ry);
@@ -294,7 +305,7 @@ void draw_chunk(Attrib *attrib, Chunk *chunk) {
     draw_triangles_3d(attrib, chunk->buffer, chunk->faces * 6);
 }
 
-void draw_item(Attrib *attrib, GLuint buffer, int count) {
+void draw_buffer(Attrib *attrib, GLuint buffer, int count) {
     draw_triangles_3d(attrib, buffer, count);
 }
 
@@ -306,11 +317,18 @@ void draw_text(Attrib *attrib, GLuint buffer, int length) {
 }
 
 void draw_cube(Attrib *attrib, GLuint buffer) {
-    draw_item(attrib, buffer, 36);
+    draw_buffer(attrib, buffer, 36);
 }
 
 void draw_plant(Attrib *attrib, GLuint buffer) {
-    draw_item(attrib, buffer, 24);
+    draw_buffer(attrib, buffer, 24);
+}
+
+void draw_item(Attrib *attrib, GLuint buffer) {
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    draw_triangles_2d(attrib, buffer, 6);
+    glDisable(GL_BLEND);
 }
 
 void draw_player(Attrib *attrib, Player *player) {
@@ -942,36 +960,45 @@ void render_inventory_bar(Attrib *attrib, float x, float y, float n, int sel) {
 
 void render_inventory_item(Attrib *attrib, Item item, float x, float y, float size) {
     glUseProgram(attrib->program);
-    glUniform3f(attrib->camera, 0, 0, 5);
-    glUniform1i(attrib->sampler, BlockTexture.index);
-    glUniform1f(attrib->timer, M_PI_2);
 
     float matrix[16];
     GLuint buffer;
 
-    set_matrix_item(matrix, width, height, size, x, y);
+    if (is_item(item.w)) {
+        set_matrix_2d(matrix, width, height);
+        glClear(GL_DEPTH_BUFFER_BIT);
+        glUniform1i(attrib->sampler, ItemTexture.index);
+    } else {
+        glUniform3f(attrib->camera, 0, 0, 5);
+        glUniform1f(attrib->timer, M_PI_2);
+        glUniform1i(attrib->sampler, BlockTexture.index);
+        set_matrix_item(matrix, width, height, size, x, y);
+    }
 
     // render selected item
     if (is_plant(item.w)) {
-        glDeleteBuffers(1, &buffer);
         buffer = gen_plant_buffer(0, 0, 0, 0.5, item.w);
-    }
-    else {
+    } else if (is_item(item.w)) {
+        buffer = gen_item_buffer(x, y, size, item.w);
+    } else {
         buffer = gen_cube_buffer(0, 0, 0, 0.5, item.w);
     }
+
     glUniformMatrix4fv(attrib->matrix, 1, GL_FALSE, matrix);
 
     if (is_plant(item.w)) {
         draw_plant(attrib, buffer);
         del_buffer(buffer);
-    }
-    else {
+    } else if (is_item(item.w)) {
+        draw_item(attrib, buffer);
+        del_buffer(buffer);
+    } else {
         draw_cube(attrib, buffer);
         del_buffer(buffer);
     }
 }
 
-void render_inventory_items(Attrib *attrib, float x, float y, float size, int row) {
+void render_inventory_items(Attrib *block_attrib, Attrib *item_attrib, float x, float y, float size, int row) {
     for (int item = 0; item < INVENTORY_SLOTS; item ++) {
         Item block = inventory.items[item + (row * INVENTORY_SLOTS)];
 
@@ -988,7 +1015,10 @@ void render_inventory_items(Attrib *attrib, float x, float y, float size, int ro
         float slotoff = ((float)item - (float)(INVENTORY_SLOTS - 1) / 2) * 1.5;
         float xpos = x + slotoff * size;
 
-        render_inventory_item(attrib, block, xpos, y, size * 0.75);
+        if (is_item(block.w))
+            render_inventory_item(item_attrib, block, xpos, y - size * 0.5, size);
+        else
+            render_inventory_item(block_attrib, block, xpos, y, size * 0.75);
     }
 }
 
@@ -1028,29 +1058,32 @@ void render_inventory_texts(Attrib *attrib, float x, float y, float n, int row) 
     }
 }
 
-void render_inventory(Attrib *window_attrib, Attrib *item_attrib, Attrib *text_attrib,
+void render_inventory(Attrib *window_attrib, Attrib *block_attrib, Attrib *text_attrib, Attrib *item_attrib,
                           float x, float y, float n, int sel) {
     render_inventory_bar(window_attrib, x, y, n, sel);
     glClear(GL_DEPTH_BUFFER_BIT);
-    render_inventory_items(item_attrib, x, y, n / 1.5, 0);
+    render_inventory_items(block_attrib, item_attrib, x, y, n / 1.5, 0);
     glClear(GL_DEPTH_BUFFER_BIT);
     render_inventory_texts(text_attrib, x, y, n, 0);
 }
 
-void render_inventory_screen(Attrib *window_attrib, Attrib *item_attrib, Attrib *text_attrib,
+void render_inventory_screen(Attrib *window_attrib, Attrib *block_attrib, Attrib *text_attrib, Attrib *item_attrib,
                       float x, float y, float n, int sel) {
     for (int row = 0; row < INVENTORY_ROWS; row ++) {
         render_inventory_bar(window_attrib, x, y + n*row, n, sel - (row * INVENTORY_SLOTS));
         glClear(GL_DEPTH_BUFFER_BIT);
-        render_inventory_items(item_attrib, x, y + n*row, n / 1.5, row);
+        render_inventory_items(block_attrib, item_attrib, x, y + n*row, n / 1.5, row);
         glClear(GL_DEPTH_BUFFER_BIT);
         render_inventory_texts(text_attrib, x, y + n*row, n, row);
     }
 }
 
-void render_inventory_held(Attrib *item_attrib, Attrib *text_attrib,
+void render_inventory_held(Attrib *block_attrib, Attrib *text_attrib, Attrib *item_attrib,
                            float x, float y, float n) {
-    render_inventory_item(item_attrib, inventory.holding, x, height - y, (n / 1.5) * 0.75);
+    if (is_item(inventory.holding.w))
+        render_inventory_item(item_attrib, inventory.holding, x, (height - y) - (n / 1.5) * 0.5, n / 1.5);
+    else
+        render_inventory_item(item_attrib, inventory.holding, x, height - y, (n / 1.5) * 0.75);
     glClear(GL_DEPTH_BUFFER_BIT);
 
     if (inventory.holding.count > 1) {
@@ -1477,11 +1510,20 @@ int main(int argc, char **argv) {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     load_png_texture("sky.png");
 
+    GLuint item_texture;
+    glGenTextures(1, &item_texture);
+    glActiveTexture(ItemTexture.glIndex);
+    glBindTexture(GL_TEXTURE_2D, item_texture);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    load_png_texture("item.png");
+
     Attrib block_attrib = {0};
     Attrib line_attrib = {0};
     Attrib text_attrib = {0};
     Attrib inventory_attrib = {0};
     Attrib sky_attrib = {0};
+    Attrib item_attrib = {0};
     GLuint program;
 
     program = load_program(
@@ -1527,6 +1569,14 @@ int main(int argc, char **argv) {
     sky_attrib.matrix = glGetUniformLocation(program, "matrix");
     sky_attrib.sampler = glGetUniformLocation(program, "sampler");
     sky_attrib.timer = glGetUniformLocation(program, "timer");
+
+    program = load_program(
+                           "shaders/item_vertex.glsl", "shaders/item_fragment.glsl");
+    item_attrib.program = program;
+    item_attrib.position = glGetAttribLocation(program, "position");
+    item_attrib.uv = glGetAttribLocation(program, "uv");
+    item_attrib.matrix = glGetUniformLocation(program, "matrix");
+    item_attrib.sampler = glGetUniformLocation(program, "sampler");
 
     FPS fps = {0, 0, 0};
     int message_index = 0;
@@ -1720,10 +1770,11 @@ int main(int argc, char **argv) {
                     double current = glfwGetTime();
 
                     double elapsed = (current - breaking_start);
+                    double modifier = item_affection_id(inventory.items[inventory.selected].w, hw);
 
-                    int hb = MIN(9, 1 + MAX(0, (8 * elapsed / get_block(hw).break_duration)));
+                    int hb = MIN(9, 1 + MAX(0, (8 * elapsed / get_item(hw).break_duration) / modifier));
 
-                    if (hb > 8 || CREATIVE_MODE || get_block(hw).break_duration == 0.0) {
+                    if (hb > 8 || CREATIVE_MODE || get_item(hw).break_duration == 0.0) {
                         breaking_block.w = 0;
 
                         set_block(hx, hy, hz, 0, 0);
@@ -2003,12 +2054,12 @@ int main(int argc, char **argv) {
 
         int inv_offset = (observe2 ? 288 : 0);
 
-        render_inventory(&inventory_attrib, &block_attrib, &text_attrib, (width - inv_offset) / 2, INVENTORY_ITEM_SIZE, INVENTORY_ITEM_SIZE * 1.5, inventory.selected);
+        render_inventory(&inventory_attrib, &block_attrib, &text_attrib, &item_attrib, (width - inv_offset) / 2, INVENTORY_ITEM_SIZE, INVENTORY_ITEM_SIZE * 1.5, inventory.selected);
 
         if (inventory_screen) {
-            render_inventory_screen(&inventory_attrib, &block_attrib, &text_attrib, (width - inv_offset) / 2, height / 2, INVENTORY_ITEM_SIZE * 1.5, inventory.highlighted);
+            render_inventory_screen(&inventory_attrib, &block_attrib, &text_attrib, &item_attrib, (width - inv_offset) / 2, height / 2, INVENTORY_ITEM_SIZE * 1.5, inventory.highlighted);
             if (inventory.holding.count > 0) {
-                render_inventory_held(&block_attrib, &text_attrib, px, py, INVENTORY_ITEM_SIZE * 1.5);
+                render_inventory_held(&block_attrib, &text_attrib, &item_attrib, px, py, INVENTORY_ITEM_SIZE * 1.5);
             }
         }
         player = players + observe1;
