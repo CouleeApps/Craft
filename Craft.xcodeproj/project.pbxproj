@@ -801,8 +801,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				B5DD996C1866B54300634CC0 /* item.c in Sources */,
 				B58A7649185EC12A00655BD9 /* main.c in Sources */,
+				B5DD996C1866B54300634CC0 /* item.c in Sources */,
 				B58A7641185EC09D00655BD9 /* client.c in Sources */,
 				B58A7642185EC09D00655BD9 /* cube.c in Sources */,
 				B58A7643185EC09D00655BD9 /* db.c in Sources */,

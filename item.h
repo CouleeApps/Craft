@@ -54,36 +54,36 @@ int is_destructable(int w);
 int is_selectable(int w);
 
 /* BLOCKS */
-static ItemType Unknown;
-static ItemType Air;
-static ItemType Grass;
-static ItemType Sand;
-static ItemType Slab;
-static ItemType Brick;
-static ItemType Wood;
-static ItemType Stone;
-static ItemType Dirt;
-static ItemType Plank;
-static ItemType Snow;
-static ItemType Glass;
-static ItemType Cobblestone;
-static ItemType LightSlab;
-static ItemType DarkSlab;
-static ItemType WoodBox;
-static ItemType Leaf;
-static ItemType Cloud;
-static ItemType TallGrass;
-static ItemType Flower1;
-static ItemType Flower2;
-static ItemType Flower3;
-static ItemType Flower4;
-static ItemType Flower5;
-static ItemType Flower6;
-static ItemType Flower7;
+#define Unknown     get_item(-1)
+#define Air         get_item( 0)
+#define Grass       get_item( 1)
+#define Sand        get_item( 2)
+#define Slab        get_item( 3)
+#define Brick       get_item( 4)
+#define Wood        get_item( 5)
+#define Stone       get_item( 6)
+#define Dirt        get_item( 7)
+#define Plank       get_item( 8)
+#define Snow        get_item( 9)
+#define Glass       get_item(10)
+#define Cobblestone get_item(11)
+#define LightSlab   get_item(12)
+#define DarkSlab    get_item(13)
+#define WoodBox     get_item(14)
+#define Leaf        get_item(15)
+#define Cloud       get_item(16)
+#define TallGrass   get_item(17)
+#define Flower1     get_item(18)
+#define Flower2     get_item(19)
+#define Flower3     get_item(20)
+#define Flower4     get_item(21)
+#define Flower5     get_item(22)
+#define Flower6     get_item(23)
+#define Flower7     get_item(24)
 /* ITEMS */
-static ItemType Pickaxe;
-static ItemType Shovel;
-static ItemType Axe;
-static ItemType Sword;
+#define Pickaxe     get_item(256)
+#define Shovel      get_item(257)
+#define Axe         get_item(258)
+#define Sword       get_item(259)
 
 #endif /* item_h */

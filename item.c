@@ -2,11 +2,11 @@
 #include <stdlib.h>
 #include "item.h"
 
-#define define_block(store, d, c, h, b, p, t, s, q, m, y) \
-{ item_types[item_count] = store = (ItemType){item_count, d, c, h, b, p, t, s, q, m, NULL, NULL, 0, y}; item_count ++; }
-#define define_item(store, h, b, p, t, s, q, m, ac, y) \
+#define define_block(d, c, h, b, p, t, s, q, m, y) \
+{ item_types[item_count] = (ItemType){item_count, d, c, h, b, p, t, s, q, m, NULL, NULL, 0, y}; item_count ++; }
+#define define_item(h, b, p, t, s, q, m, ac, y) \
 {\
-item_types[item_count] = store = (ItemType){item_count, 0, 0, h, b, p, t, s, q, m, NULL, NULL, ac, y}; \
+item_types[item_count] = (ItemType){item_count, 0, 0, h, b, p, t, s, q, m, NULL, NULL, ac, y}; \
 item_types[item_count].affects = calloc(ac, sizeof(ItemMaterialType)); \
 item_types[item_count].affections = calloc(ac, sizeof(double)); \
 item_count ++; \
@@ -21,46 +21,46 @@ void init_items() {
     item_types = calloc(1024, sizeof(ItemType));
     item_count = -1;
 
-    //  h = hardness, b = breakable, p = placeable, t = transparent, s = solid, q = max quantity, y = type
-    //  define_item(Block,         h, b, p, t, s,  q, y                 );
-    /* -1 */ define_block(Unknown,     item_count, 0, 0.0, 0, 0, 1, 0,  0, ItemMaterialTypeNone,  ItemRenderTypeNone);
-    /*  0 */ define_block(Air,         item_count, 0, 0.0, 0, 0, 1, 0,  0, ItemMaterialTypeNone,  ItemRenderTypeNone);
-    /*  1 */ define_block(Grass,                7, 1, 0.6, 1, 1, 0, 1, 64, ItemMaterialTypeSoil,  ItemRenderTypeBlock);
-    /*  2 */ define_block(Sand,        item_count, 1, 0.3, 1, 1, 0, 1, 64, ItemMaterialTypeSoil,  ItemRenderTypeBlock);
-    /*  3 */ define_block(Slab,        item_count, 1, 2.5, 1, 1, 0, 1, 64, ItemMaterialTypeStone, ItemRenderTypeBlock);
-    /*  4 */ define_block(Brick,       item_count, 1, 3.5, 1, 1, 0, 1, 64, ItemMaterialTypeStone, ItemRenderTypeBlock);
-    /*  5 */ define_block(Wood,        item_count, 1, 1.5, 1, 1, 0, 1, 64, ItemMaterialTypeWood,  ItemRenderTypeBlock);
-    /*  6 */ define_block(Stone,               11, 1, 3.0, 1, 1, 0, 1, 64, ItemMaterialTypeStone, ItemRenderTypeBlock);
-    /*  7 */ define_block(Dirt,        item_count, 1, 0.5, 1, 1, 0, 1, 64, ItemMaterialTypeSoil,  ItemRenderTypeBlock);
-    /*  8 */ define_block(Plank,       item_count, 1, 1.0, 1, 1, 0, 1, 64, ItemMaterialTypeWood,  ItemRenderTypeBlock);
-    /*  9 */ define_block(Snow,                 7, 1, 0.6, 1, 1, 0, 1, 64, ItemMaterialTypeSoil,  ItemRenderTypeBlock);
-    /* 10 */ define_block(Glass,                0, 0, 0.7, 1, 1, 1, 1, 64, ItemMaterialTypeSoil,  ItemRenderTypeBlock);
-    /* 11 */ define_block(Cobblestone, item_count, 1, 4.0, 1, 1, 0, 1, 64, ItemMaterialTypeStone, ItemRenderTypeBlock);
-    /* 12 */ define_block(LightSlab,   item_count, 1, 3.5, 1, 1, 0, 1, 64, ItemMaterialTypeStone, ItemRenderTypeBlock);
-    /* 13 */ define_block(DarkSlab,    item_count, 1, 3.5, 1, 1, 0, 1, 64, ItemMaterialTypeStone, ItemRenderTypeBlock);
-    /* 14 */ define_block(WoodBox,              8, 1, 2.0, 1, 1, 0, 1, 64, ItemMaterialTypeWood,  ItemRenderTypeBlock);
-    /* 15 */ define_block(Leaf,        item_count, 1, 0.2, 1, 1, 1, 1, 64, ItemMaterialTypePlant, ItemRenderTypeBlock);
-    /* 16 */ define_block(Cloud,                0, 0, 0.0, 0, 0, 1, 0,  0, ItemMaterialTypeNone,  ItemRenderTypeBlock);
-    /* 17 */ define_block(TallGrass,   item_count, 1, 0.0, 1, 1, 1, 0, 64, ItemMaterialTypePlant, ItemRenderTypePlant);
-    /* 18 */ define_block(Flower1,     item_count, 1, 0.0, 1, 1, 1, 0, 64, ItemMaterialTypePlant, ItemRenderTypePlant);
-    /* 19 */ define_block(Flower2,     item_count, 1, 0.0, 1, 1, 1, 0, 64, ItemMaterialTypePlant, ItemRenderTypePlant);
-    /* 20 */ define_block(Flower3,     item_count, 1, 0.0, 1, 1, 1, 0, 64, ItemMaterialTypePlant, ItemRenderTypePlant);
-    /* 21 */ define_block(Flower4,     item_count, 1, 0.0, 1, 1, 1, 0, 64, ItemMaterialTypePlant, ItemRenderTypePlant);
-    /* 22 */ define_block(Flower5,     item_count, 1, 0.0, 1, 1, 1, 0, 64, ItemMaterialTypePlant, ItemRenderTypePlant);
-    /* 23 */ define_block(Flower6,     item_count, 1, 0.0, 1, 1, 1, 0, 64, ItemMaterialTypePlant, ItemRenderTypePlant);
-    /* 24 */ define_block(Flower7,     item_count, 1, 0.0, 1, 1, 1, 0, 64, ItemMaterialTypePlant, ItemRenderTypePlant);
+    //  d = drop, dc = drop count, h = hardness, b = breakable, p = placeable, t = transparent, s = solid, q = max quantity, m = material, y = type
+    //  		 define_block(         d,dc,   h, b, p, t, s,  q, m,                     y                 );
+    /* -1 */ define_block(item_count, 0, 0.0, 0, 0, 1, 0,  0, ItemMaterialTypeNone,  ItemRenderTypeNone);
+    /*  0 */ define_block(item_count, 0, 0.0, 0, 0, 1, 0,  0, ItemMaterialTypeNone,  ItemRenderTypeNone);
+    /*  1 */ define_block(         7, 1, 0.6, 1, 1, 0, 1, 64, ItemMaterialTypeSoil,  ItemRenderTypeBlock);
+    /*  2 */ define_block(item_count, 1, 0.3, 1, 1, 0, 1, 64, ItemMaterialTypeSoil,  ItemRenderTypeBlock);
+    /*  3 */ define_block(item_count, 1, 2.5, 1, 1, 0, 1, 64, ItemMaterialTypeStone, ItemRenderTypeBlock);
+    /*  4 */ define_block(item_count, 1, 3.5, 1, 1, 0, 1, 64, ItemMaterialTypeStone, ItemRenderTypeBlock);
+    /*  5 */ define_block(item_count, 1, 1.5, 1, 1, 0, 1, 64, ItemMaterialTypeWood,  ItemRenderTypeBlock);
+    /*  6 */ define_block(        11, 1, 3.0, 1, 1, 0, 1, 64, ItemMaterialTypeStone, ItemRenderTypeBlock);
+    /*  7 */ define_block(item_count, 1, 0.5, 1, 1, 0, 1, 64, ItemMaterialTypeSoil,  ItemRenderTypeBlock);
+    /*  8 */ define_block(item_count, 1, 1.0, 1, 1, 0, 1, 64, ItemMaterialTypeWood,  ItemRenderTypeBlock);
+    /*  9 */ define_block(         7, 1, 0.6, 1, 1, 0, 1, 64, ItemMaterialTypeSoil,  ItemRenderTypeBlock);
+    /* 10 */ define_block(         0, 0, 0.7, 1, 1, 1, 1, 64, ItemMaterialTypeSoil,  ItemRenderTypeBlock);
+    /* 11 */ define_block(item_count, 1, 4.0, 1, 1, 0, 1, 64, ItemMaterialTypeStone, ItemRenderTypeBlock);
+    /* 12 */ define_block(item_count, 1, 3.5, 1, 1, 0, 1, 64, ItemMaterialTypeStone, ItemRenderTypeBlock);
+    /* 13 */ define_block(item_count, 1, 3.5, 1, 1, 0, 1, 64, ItemMaterialTypeStone, ItemRenderTypeBlock);
+    /* 14 */ define_block(         8, 1, 2.0, 1, 1, 0, 1, 64, ItemMaterialTypeWood,  ItemRenderTypeBlock);
+    /* 15 */ define_block(item_count, 1, 0.2, 1, 1, 1, 1, 64, ItemMaterialTypePlant, ItemRenderTypeBlock);
+    /* 16 */ define_block(         0, 0, 0.0, 0, 0, 1, 0,  0, ItemMaterialTypeNone,  ItemRenderTypeBlock);
+    /* 17 */ define_block(item_count, 1, 0.0, 1, 1, 1, 0, 64, ItemMaterialTypePlant, ItemRenderTypePlant);
+    /* 18 */ define_block(item_count, 1, 0.0, 1, 1, 1, 0, 64, ItemMaterialTypePlant, ItemRenderTypePlant);
+    /* 19 */ define_block(item_count, 1, 0.0, 1, 1, 1, 0, 64, ItemMaterialTypePlant, ItemRenderTypePlant);
+    /* 20 */ define_block(item_count, 1, 0.0, 1, 1, 1, 0, 64, ItemMaterialTypePlant, ItemRenderTypePlant);
+    /* 21 */ define_block(item_count, 1, 0.0, 1, 1, 1, 0, 64, ItemMaterialTypePlant, ItemRenderTypePlant);
+    /* 22 */ define_block(item_count, 1, 0.0, 1, 1, 1, 0, 64, ItemMaterialTypePlant, ItemRenderTypePlant);
+    /* 23 */ define_block(item_count, 1, 0.0, 1, 1, 1, 0, 64, ItemMaterialTypePlant, ItemRenderTypePlant);
+    /* 24 */ define_block(item_count, 1, 0.0, 1, 1, 1, 0, 64, ItemMaterialTypePlant, ItemRenderTypePlant);
     while (item_count < 256)
         define_item_null();
-    define_item(Pickaxe,      0.0, 0, 0, 0, 0,  1, ItemMaterialTypeNone, 1, ItemRenderTypeItem);
+    define_item(0.0, 0, 0, 0, 0,  1, ItemMaterialTypeNone, 1, ItemRenderTypeItem);
     item_types[item_count - 1].affects[0] = ItemMaterialTypeStone;
     item_types[item_count - 1].affections[0] = 0.3333;
-    define_item(Shovel,       0.0, 0, 0, 0, 0,  1, ItemMaterialTypeNone, 1, ItemRenderTypeItem);
+    define_item(0.0, 0, 0, 0, 0,  1, ItemMaterialTypeNone, 1, ItemRenderTypeItem);
     item_types[item_count - 1].affects[0] = ItemMaterialTypeSoil;
     item_types[item_count - 1].affections[0] = 0.3333;
-    define_item(Axe,          0.0, 0, 0, 0, 0,  1, ItemMaterialTypeNone, 1, ItemRenderTypeItem);
+    define_item(0.0, 0, 0, 0, 0,  1, ItemMaterialTypeNone, 1, ItemRenderTypeItem);
     item_types[item_count - 1].affects[0] = ItemMaterialTypeWood;
     item_types[item_count - 1].affections[0] = 0.3333;
-    define_item(Sword,        0.0, 0, 0, 0, 0,  1, ItemMaterialTypeNone, 1, ItemRenderTypeItem);
+    define_item(0.0, 0, 0, 0, 0,  1, ItemMaterialTypeNone, 1, ItemRenderTypeItem);
     item_types[item_count - 1].affects[0] = ItemMaterialTypePlant;
     item_types[item_count - 1].affections[0] = 0.3333;
 }

@@ -625,7 +625,7 @@ void gen_chunk_buffer(Chunk *chunk) {
         }
         int f1 = 0, f2 = 0, f3 = 0, f4 = 0, f5 = 0, f6 = 0;
         exposed_faces(map, e->x, e->y, e->z, &f1, &f2, &f3, &f4, &f5, &f6);
-        int total = f1 + f2 + f3 + f4 + f5 + f6;
+        int total = !!f1 + !!f2 + !!f3 + !!f4 + !!f5 + !!f6;
         if (is_plant(e->w)) {
             total = total ? 4 : 0;
         }
@@ -635,7 +635,7 @@ void gen_chunk_buffer(Chunk *chunk) {
         faces += total;
     } END_MAP_FOR_EACH;
 
-    if (faces > 0x1000000) {
+    if (faces > 0x1000000 || faces < 0) {
         printf("PANIC MODE SET A BREAKPOINT\n");
         return;
     }
@@ -646,9 +646,9 @@ void gen_chunk_buffer(Chunk *chunk) {
         if (e->w <= 0) {
             continue;
         }
-        int f1, f2, f3, f4, f5, f6;
+        int f1 = 0, f2 = 0, f3 = 0, f4 = 0, f5 = 0, f6 = 0;
         exposed_faces(map, e->x, e->y, e->z, &f1, &f2, &f3, &f4, &f5, &f6);
-        int total = f1 + f2 + f3 + f4 + f5 + f6;
+        int total = !!f1 + !!f2 + !!f3 + !!f4 + !!f5 + !!f6;
         if (is_plant(e->w)) {
             total = total ? 4 : 0;
         }
@@ -1399,6 +1399,7 @@ int main(int argc, char **argv) {
 
     srand(time(NULL));
     rand();
+    init_items();
     if (argc == 2 || argc == 3) {
         char *hostname = argv[1];
         int port = DEFAULT_PORT;
@@ -1431,7 +1432,6 @@ int main(int argc, char **argv) {
         glfwTerminate();
         return -1;
     }
-    init_items();
     glfwMakeContextCurrent(window);
     glfwSwapInterval(VSYNC);
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
