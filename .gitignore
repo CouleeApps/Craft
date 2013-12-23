@@ -14,3 +14,4 @@ xcuserdata
 *.orig
 *.pyc
 Info.plist
+*.exe

@@ -1,7 +1,8 @@
-#ifndef __APPLE_CC__
-    #include <GL/glew.h>
+#ifdef _WIN32
+    #include <windows.h>
 #endif
 
+#include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include <math.h>
 #include <stdio.h>
@@ -78,9 +79,10 @@ typedef struct {
     GLuint uv;
     GLuint matrix;
     GLuint sampler;
-    GLuint sampler2;
     GLuint camera;
     GLuint timer;
+    GLuint extra1;
+    GLuint extra2;
 } Attrib;
 
 static GLFWwindow *window;
@@ -98,6 +100,7 @@ static int middle_click = 0;
 static int observe1 = 0;
 static int observe2 = 0;
 static int flying = 0;
+static int scale = 1;
 static int ortho = 0;
 static float fov = 65;
 static int typing = 0;
@@ -119,6 +122,29 @@ float time_of_day() {
     t = t / DAY_LENGTH;
     t = t - (int)t;
     return t;
+}
+
+float get_daylight() {
+    float timer = time_of_day();
+    if (timer < 0.5) {
+        float t = (timer - 0.25) * 100;
+        return 1 / (1 + powf(2, -t));
+    }
+    else {
+        float t = (timer - 0.90) * 100;
+        return 1 - 1 / (1 + powf(2, -t));
+    }
+}
+
+int get_scale_factor() {
+    int window_width, window_height;
+    int buffer_width, buffer_height;
+    glfwGetWindowSize(window, &window_width, &window_height);
+    glfwGetFramebufferSize(window, &buffer_width, &buffer_height);
+    int result = buffer_width / window_width;
+    result = MAX(1, result);
+    result = MIN(2, result);
+    return result;
 }
 
 void get_sight_vector(float rx, float ry, float *vx, float *vy, float *vz) {
@@ -159,7 +185,7 @@ void get_motion_vector(int flying, int sz, int sx, float rx, float ry,
 GLuint gen_crosshair_buffer() {
     int x = width / 2;
     int y = height / 2;
-    int p = 10;
+    int p = 10 * scale;
     float data[] = {
         x, y - p, x, y + p,
         x - p, y, x + p, y
@@ -846,7 +872,8 @@ int render_chunks(Attrib *attrib, Player *player) {
     glUniformMatrix4fv(attrib->matrix, 1, GL_FALSE, matrix);
     glUniform3f(attrib->camera, s->x, s->y, s->z);
     glUniform1i(attrib->sampler, BlockTexture.index);
-    glUniform1i(attrib->sampler2, SkyTexture.index);
+    glUniform1i(attrib->extra1, SkyTexture.index);
+    glUniform1f(attrib->extra2, get_daylight());
     glUniform1f(attrib->timer, time_of_day());
     for (int i = 0; i < chunk_count; i++) {
         Chunk *chunk = chunks + i;
@@ -915,7 +942,7 @@ void render_crosshairs(Attrib *attrib) {
     float matrix[16];
     set_matrix_2d(matrix, width, height);
     glUseProgram(attrib->program);
-    glLineWidth(4);
+    glLineWidth(4 * scale);
     glEnable(GL_COLOR_LOGIC_OP);
     glUniformMatrix4fv(attrib->matrix, 1, GL_FALSE, matrix);
     GLuint crosshair_buffer = gen_crosshair_buffer();
@@ -1435,6 +1462,10 @@ void create_window() {
 }
 
 int main(int argc, char **argv) {
+    #ifdef _WIN32
+        WSADATA wsa_data;
+        WSAStartup(MAKEWORD(2, 2), &wsa_data);
+    #endif
     // Set dir
     char *base = dirname(argv[0]);
 
@@ -1486,11 +1517,9 @@ int main(int argc, char **argv) {
     glfwSetMouseButtonCallback(window, on_mouse_button);
     glfwSetScrollCallback(window, on_scroll);
 
-    #ifndef __APPLE__
-        if (glewInit() != GLEW_OK) {
-            return -1;
-        }
-    #endif
+    if (glewInit() != GLEW_OK) {
+        return -1;
+    }
 
     glEnable(GL_CULL_FACE);
     glEnable(GL_DEPTH_TEST);
@@ -1555,7 +1584,8 @@ int main(int argc, char **argv) {
     block_attrib.uv = glGetAttribLocation(program, "uv");
     block_attrib.matrix = glGetUniformLocation(program, "matrix");
     block_attrib.sampler = glGetUniformLocation(program, "sampler");
-    block_attrib.sampler2 = glGetUniformLocation(program, "sampler2");
+    block_attrib.extra1 = glGetUniformLocation(program, "sky_sampler");
+    block_attrib.extra2 = glGetUniformLocation(program, "daylight");
     block_attrib.camera = glGetUniformLocation(program, "camera");
     block_attrib.timer = glGetUniformLocation(program, "timer");
 
@@ -1635,6 +1665,7 @@ int main(int argc, char **argv) {
         y = highest_block(x, z) + 2;
     }
 
+    scale = get_scale_factor();
     int has_pick = 0, has_shovel = 0, has_axe = 0, has_sword = 0;
 
     for (int item = 0; item < INVENTORY_SLOTS * INVENTORY_ROWS; item ++) {
@@ -2048,7 +2079,7 @@ int main(int argc, char **argv) {
 
         // RENDER TEXT //
         char text_buffer[1024];
-        float ts = 12;
+        float ts = 12 * scale;
         float tx = ts / 2;
         float ty = height - ts;
         int hour = time_of_day() * 24;
@@ -2081,23 +2112,25 @@ int main(int argc, char **argv) {
         // RENDER PICTURE IN PICTURE //
         if (observe2) {
             player = players + observe2;
-            int pw = 256;
-            int ph = 256;
-            int pad = 3;
+
+            int pw = 256 * scale;
+            int ph = 256 * scale;
+            int offset = 32 * scale;
+            int pad = 3 * scale;
             int sw = pw + pad * 2;
             int sh = ph + pad * 2;
             int ow = width, oh = height;
 
             glEnable(GL_SCISSOR_TEST);
-            glScissor(width - sw - 32 + pad, 32 - pad, sw, sh);
+            glScissor(width - sw - offset + pad, offset - pad, sw, sh);
             glClearColor(0, 0, 0, 1);
             glClear(GL_COLOR_BUFFER_BIT);
-            glScissor(width - pw - 32, 32, pw, ph);
+            glScissor(width - pw - offset, offset, pw, ph);
             glClearColor(0.53, 0.81, 0.92, 1.00);
             glClear(GL_COLOR_BUFFER_BIT);
             glDisable(GL_SCISSOR_TEST);
             glClear(GL_DEPTH_BUFFER_BIT);
-            glViewport(width - pw - 32, 32, pw, ph);
+            glViewport(width - pw - offset, offset, pw, ph);
 
             width = pw;
             height = ph;
