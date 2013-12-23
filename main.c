@@ -33,7 +33,8 @@
 #define LEFT 0
 #define CENTER 1
 #define RIGHT 2
-#define INVENTORY_ITEMS (INVENTORY_SLOTS * INVENTORY_ROWS) + 10
+#define INVENTORY_ITEMS (INVENTORY_SLOTS * INVENTORY_ROWS)
+#define INVENTORY_CRAFT_ITEMS (INVENTORY_CRAFT_SIZE * INVENTORY_CRAFT_SIZE)
 
 typedef struct {
     int index;
@@ -1040,7 +1041,7 @@ void render_inventory_item(Attrib *attrib, Item item, float x, float y, float si
 void render_crafting_items(Attrib *block_attrib, Attrib *item_attrib, float x, float y, float size) {
     for (int row = 0; row < 3; row ++) {
         for (int col = 0; col < 3; col ++) {
-            Item block = inventory.items[(INVENTORY_ROWS * INVENTORY_SLOTS) + (col + (row * 3))];
+            Item block = inventory.crafting[col + (row * 3)];
 
             if (block.w == 0)
                 continue;
@@ -1062,7 +1063,7 @@ void render_crafting_items(Attrib *block_attrib, Attrib *item_attrib, float x, f
                 render_inventory_item(block_attrib, block, xpos, ypos, size * 0.75);
         }
     }
-    Item block = inventory.items[INVENTORY_ITEMS - 1];
+    Item block = inventory.crafted;
     if (block.w != 0) {
         float xpos = x + (1 * size) * 1.5;
         float ypos = y - (size * (is_item(block.w) ? 0.5 : 0));
@@ -1121,7 +1122,7 @@ void render_inventory_text(Attrib *attrib, Item item, float x, float y, float n)
 void render_crafting_texts(Attrib *attrib, float x, float y, float n) {
     for (int row = 0; row < 3; row ++) {
         for (int col = 0; col < 3; col ++) {
-            Item block = inventory.items[(INVENTORY_ROWS * INVENTORY_SLOTS) + (col + (row * 3))];
+            Item block = inventory.crafting[col + (row * 3)];
 
             if (block.w == 0)
                 continue;
@@ -1139,7 +1140,7 @@ void render_crafting_texts(Attrib *attrib, float x, float y, float n) {
             render_inventory_text(attrib, block, tx, ty, n);
         }
     }
-    Item block = inventory.items[INVENTORY_ITEMS - 1];
+    Item block = inventory.crafted;
     if (block.w != 0) {
         float sep = INVENTORY_ITEM_SIZE * 1.5;
         float tx = x + sep;
@@ -1338,6 +1339,19 @@ void on_scroll(GLFWwindow *window, double xdelta, double ydelta) {
     }
 }
 
+
+Item *get_inventory_item_ptr(int item) {
+    if (item >= INVENTORY_ITEMS + INVENTORY_CRAFT_ITEMS)
+        return &inventory.crafted;
+    if (item >= INVENTORY_ITEMS)
+        return &inventory.crafting[item - INVENTORY_ITEMS];
+    return &inventory.items[item];
+}
+
+Item get_inventory_item(int item) {
+    return *get_inventory_item_ptr(item);
+}
+
 void on_mouse_button(GLFWwindow *window, int button, int action, int mods) {
     if (action == GLFW_RELEASE) {
         if (button == GLFW_MOUSE_BUTTON_LEFT)
@@ -1366,13 +1380,15 @@ void on_mouse_button(GLFWwindow *window, int button, int action, int mods) {
                 glfwGetCursorPos(window, &mx, &my);
 
                 int sel = mouse_to_inventory(width - inv_width_offset, height, mx, my - inv_height_offset, INVENTORY_ITEM_SIZE * 1.5);
+                Item *sel_item = get_inventory_item_ptr(sel);
+
                 if (inventory.holding.count == 0) {
                     if (sel != -1) {
                         //Pick up
-                        inventory.holding.count = inventory.items[sel].count;
-                        inventory.holding.w = inventory.items[sel].w;
-                        inventory.items[sel].count = 0;
-                        inventory.items[sel].w = 0;
+                        inventory.holding.count = sel_item->count;
+                        inventory.holding.w = sel_item->w;
+                        sel_item->count = 0;
+                        sel_item->w = 0;
                     }
                 } else {
                     if (sel == -1) {
@@ -1381,24 +1397,24 @@ void on_mouse_button(GLFWwindow *window, int button, int action, int mods) {
                         inventory.holding.w = 0;
                     } else {
                         //Place
-                        if (inventory.items[sel].w == 0) {
+                        if (sel_item->w == 0) {
                             //Into empty
-                            inventory.items[sel].count = inventory.holding.count;
-                            inventory.items[sel].w = inventory.holding.w;
+                            sel_item->count = inventory.holding.count;
+                            sel_item->w = inventory.holding.w;
                             inventory.holding.count = 0;
                             inventory.holding.w = 0;
                         } else {
-                            if (inventory.items[sel].w == inventory.holding.w && inventory.holding.count != INVENTORY_UNLIMITED) {
+                            if (sel_item->w == inventory.holding.w && inventory.holding.count != INVENTORY_UNLIMITED) {
                                 //Into same type
-                                if (inventory.holding.count + inventory.items[sel].count <= 64) {
+                                if (inventory.holding.count + sel_item->count <= 64) {
                                     //Append all
-                                    inventory.items[sel].count += inventory.holding.count;
+                                    sel_item->count += inventory.holding.count;
                                     inventory.holding.count = 0;
                                     inventory.holding.w = 0;
                                 } else {
                                     //Append with leftover
-                                    inventory.holding.count -= 64 - inventory.items[sel].count;
-                                    inventory.items[sel].count = 64;
+                                    inventory.holding.count -= 64 - sel_item->count;
+                                    sel_item->count = 64;
                                 }
                             } else {
                                 //Into diff type
@@ -1406,8 +1422,8 @@ void on_mouse_button(GLFWwindow *window, int button, int action, int mods) {
                                 cache.count = inventory.holding.count;
                                 cache.w = inventory.holding.w;
 
-                                inventory.holding = inventory.items[sel];
-                                inventory.items[sel] = cache;
+                                inventory.holding = *sel_item;
+                                *sel_item = cache;
                             }
 
                         }
@@ -1427,19 +1443,21 @@ void on_mouse_button(GLFWwindow *window, int button, int action, int mods) {
             glfwGetCursorPos(window, &mx, &my);
 
             int sel = mouse_to_inventory(width - inv_width_offset, height, mx, my - inv_height_offset, INVENTORY_ITEM_SIZE * 1.5);
-            if (inventory.items[sel].count != INVENTORY_UNLIMITED) {
+            Item *sel_item = get_inventory_item_ptr(sel);
+
+            if (sel_item->count != INVENTORY_UNLIMITED) {
                 if (inventory.holding.count == 0) {
                     if (sel != -1) {
                         //Pick up half
-                        int pickup = ceil(inventory.items[sel].count / 2.);
+                        int pickup = ceil(sel_item->count / 2.);
 
                         inventory.holding.count = pickup;
                         if (inventory.holding.count > 0)
-                            inventory.holding.w = inventory.items[sel].w;
+                            inventory.holding.w = sel_item->w;
 
-                        inventory.items[sel].count -= pickup;
-                        if (inventory.items[sel].count == 0)
-                            inventory.items[sel].w = 0;
+                        sel_item->count -= pickup;
+                        if (sel_item->count == 0)
+                            sel_item->w = 0;
                     }
                 } else {
                     if (sel == -1) {
@@ -1449,20 +1467,20 @@ void on_mouse_button(GLFWwindow *window, int button, int action, int mods) {
                             inventory.holding.w = 0;
                     } else {
                         //Place one
-                        if (inventory.items[sel].w == 0) {
+                        if (sel_item->w == 0) {
                             //Into empty
-                            inventory.items[sel].count = 1;
-                            inventory.items[sel].w = inventory.holding.w;
+                            sel_item->count = 1;
+                            sel_item->w = inventory.holding.w;
 
                             inventory.holding.count --;
                             if (inventory.holding.count == 0)
                                 inventory.holding.w = 0;
                         } else {
-                            if (inventory.items[sel].w == inventory.holding.w) {
+                            if (sel_item->w == inventory.holding.w) {
                                 //Into same type
-                                if (inventory.items[sel].count < 64) {
+                                if (sel_item->count < 64) {
                                     //Append with one
-                                    inventory.items[sel].count ++;
+                                    sel_item->count ++;
 
                                     inventory.holding.count --;
                                     if (inventory.holding.count == 0)
@@ -1488,7 +1506,7 @@ void on_mouse_button(GLFWwindow *window, int button, int action, int mods) {
 }
 
 Item get_current_item() {
-    return inventory.items[inventory.selected];
+    return get_inventory_item(inventory.selected);
 }
 
 int get_current_block() {
@@ -1502,7 +1520,7 @@ int get_current_count() {
 int find_matching_inventory_slot(int w) {
     //Try for same type
     for (int item = 0; item < INVENTORY_SLOTS * INVENTORY_ROWS; item ++)
-        if (inventory.items[item].w == w)
+        if (get_inventory_item(item).w == w)
             return item;
     return -1;
 }
@@ -1510,15 +1528,15 @@ int find_matching_inventory_slot(int w) {
 int find_usable_inventory_slot(int w) {
     //Try for infinite
     for (int item = 0; item < INVENTORY_SLOTS * INVENTORY_ROWS; item ++)
-        if (inventory.items[item].w == w && inventory.items[item].count == INVENTORY_UNLIMITED)
+        if (get_inventory_item(item).w == w && get_inventory_item(item).count == INVENTORY_UNLIMITED)
             return -1; //Don't let them pick it up
     //Try for same type
     for (int item = 0; item < INVENTORY_SLOTS * INVENTORY_ROWS; item ++)
-        if (inventory.items[item].w == w && inventory.items[item].count < MAX_SLOT_SIZE)
+        if (get_inventory_item(item).w == w && get_inventory_item(item).count < MAX_SLOT_SIZE)
             return item;
     //Try for empty
     for (int item = 0; item < INVENTORY_SLOTS * INVENTORY_ROWS; item ++)
-        if (inventory.items[item].w == 0)
+        if (get_inventory_item(item).w == 0)
             return item;
     return -1;
 }
@@ -1736,6 +1754,16 @@ int main(int argc, char **argv) {
         inventory.items[item].w     = 0;
     }
 
+    inventory.crafting = calloc(INVENTORY_CRAFT_ITEMS, sizeof(Item));
+
+    for (int item = 0; item < INVENTORY_CRAFT_ITEMS; item ++) {
+        inventory.crafting[item].count = 0;
+        inventory.crafting[item].w     = 0;
+    }
+
+    inventory.crafted.count = 0;
+    inventory.crafted.w = 0;
+
     int loaded = db_load_state(&x, &y, &z, &rx, &ry, &inventory);
     ensure_chunks(x, y, z, 1);
     if (!loaded) {
@@ -1746,58 +1774,63 @@ int main(int argc, char **argv) {
     int has_pick = 0, has_shovel = 0, has_axe = 0, has_sword = 0;
 
     for (int item = 0; item < INVENTORY_SLOTS * INVENTORY_ROWS; item ++) {
+        Item *inv_item = get_inventory_item_ptr(item);
         if (CREATIVE_MODE) {
             if (is_selectable(item + 1)) {
-                inventory.items[item].count = INVENTORY_UNLIMITED;
-                inventory.items[item].w = item + 1;
+                inv_item->count = INVENTORY_UNLIMITED;
+                inv_item->w = item + 1;
             } else {
-                inventory.items[item].count = 0;
-                inventory.items[item].w = 0;
+                inv_item->count = 0;
+                inv_item->w = 0;
             }
         } else {
-            if (inventory.items[item].count == INVENTORY_UNLIMITED || inventory.items[item].count > 64) {
-                inventory.items[item].count = 64;
+            if (inv_item->count == INVENTORY_UNLIMITED || inv_item->count > 64) {
+                inv_item->count = 64;
             }
         }
-        if (inventory.items[item].count <= 0) {
-            inventory.items[item].count = 0;
-            inventory.items[item].w = 0;
+        if (inv_item->count <= 0) {
+            inv_item->count = 0;
+            inv_item->w = 0;
         }
-        if (inventory.items[item].w == 256)
+        if (inv_item->w == 256)
             has_pick = 1;
-        if (inventory.items[item].w == 257)
+        if (inv_item->w == 257)
             has_shovel = 1;
-        if (inventory.items[item].w == 258)
+        if (inv_item->w == 258)
             has_axe = 1;
-        if (inventory.items[item].w == 25)
+        if (inv_item->w == 25)
             has_sword = 1;
     }
     if (!has_pick) {
         int slot = find_usable_inventory_slot(256);
         if (slot != -1) {
-            inventory.items[slot].w = 256;
-            inventory.items[slot].count = 1;
+            Item *inv_item = get_inventory_item_ptr(slot);
+            inv_item->w = 256;
+            inv_item->count = 1;
         }
     }
     if (!has_shovel) {
         int slot = find_usable_inventory_slot(257);
         if (slot != -1) {
-            inventory.items[slot].w = 257;
-            inventory.items[slot].count = 1;
+            Item *inv_item = get_inventory_item_ptr(slot);
+            inv_item->w = 257;
+            inv_item->count = 1;
         }
     }
     if (!has_axe) {
         int slot = find_usable_inventory_slot(258);
         if (slot != -1) {
-            inventory.items[slot].w = 258;
-            inventory.items[slot].count = 1;
+            Item *inv_item = get_inventory_item_ptr(slot);
+            inv_item->w = 258;
+            inv_item->count = 1;
         }
     }
     if (!has_sword) {
         int slot = find_usable_inventory_slot(259);
         if (slot != -1) {
-            inventory.items[slot].w = 259;
-            inventory.items[slot].count = 1;
+            Item *inv_item = get_inventory_item_ptr(slot);
+            inv_item->w = 259;
+            inv_item->count = 1;
         }
     }
 

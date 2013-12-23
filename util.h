@@ -24,6 +24,8 @@ typedef struct {
 
 typedef struct {
     Item *items;
+    Item *crafting;
+    Item crafted;
     int selected;
     int highlighted;
     Item holding;
