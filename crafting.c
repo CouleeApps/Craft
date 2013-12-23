@@ -139,8 +139,8 @@ void init_crafting() {
     recipe_count ++;
     //-------------------------------------------------
     recipes[recipe_count] = (Recipe){
-        "11 "
-        "10 "
+        " 11"
+        " 01"
         " 0 ",
         NULL, Axe.id, 1};
     recipes[recipe_count].ids = calloc(2, sizeof(int));
