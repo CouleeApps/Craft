@@ -53,20 +53,20 @@ void init_items() {
         define_item_null();
 
     // q = max quantity, ac = affection count
-    //                define_item(q,ac);
-    /* 256 Pickaxe */ define_item(1, 1);
+    //                define_item( q,ac);
+    /* 256 Pickaxe */ define_item( 1, 1);
     item_types[item_count - 1].affects[0] = ItemMaterialTypeStone;
     item_types[item_count - 1].affections[0] = 0.3333;
-    /* 257 Shovel  */ define_item(1, 1);
+    /* 257 Shovel  */ define_item( 1, 1);
     item_types[item_count - 1].affects[0] = ItemMaterialTypeSoil;
     item_types[item_count - 1].affections[0] = 0.3333;
-    /* 258 Axe     */ define_item(1, 1);
+    /* 258 Axe     */ define_item( 1, 1);
     item_types[item_count - 1].affects[0] = ItemMaterialTypeWood;
     item_types[item_count - 1].affections[0] = 0.3333;
-    /* 259 Sword   */ define_item(1, 1);
+    /* 259 Sword   */ define_item( 1, 1);
     item_types[item_count - 1].affects[0] = ItemMaterialTypePlant;
     item_types[item_count - 1].affections[0] = 0.3333;
-    /* 260 Stick   */ define_item(1, 0);
+    /* 260 Stick   */ define_item(64, 0);
 }
 
 ItemType get_item(int id) {

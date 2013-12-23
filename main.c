@@ -1386,7 +1386,7 @@ void on_mouse_button(GLFWwindow *window, int button, int action, int mods) {
                 if (sel_item == &inventory.crafted) {
                     //CRAFTING MAGIC
                     if (sel_item->count > 0) {
-                        if ((inventory.holding.w == sel_item->w || inventory.holding.w == 0) && inventory.holding.count + sel_item->count < 64) {
+                        if ((inventory.holding.w == sel_item->w || inventory.holding.w == 0) && inventory.holding.count + sel_item->count <= item_max_quantity(sel_item->w)) {
                             //Append to holding
                             inventory.holding.count += sel_item->count;
                             inventory.holding.w = sel_item->w;
@@ -1426,15 +1426,15 @@ void on_mouse_button(GLFWwindow *window, int button, int action, int mods) {
                         } else {
                             if (sel_item->w == inventory.holding.w && inventory.holding.count != INVENTORY_UNLIMITED) {
                                 //Into same type
-                                if (inventory.holding.count + sel_item->count <= 64) {
+                                if (inventory.holding.count + sel_item->count <= item_max_quantity(sel_item->w)) {
                                     //Append all
                                     sel_item->count += inventory.holding.count;
                                     inventory.holding.count = 0;
                                     inventory.holding.w = 0;
                                 } else {
                                     //Append with leftover
-                                    inventory.holding.count -= 64 - sel_item->count;
-                                    sel_item->count = 64;
+                                    inventory.holding.count -= item_max_quantity(sel_item->w) - sel_item->count;
+                                    sel_item->count = item_max_quantity(sel_item->w);
                                 }
                             } else {
                                 //Into diff type
@@ -1498,7 +1498,7 @@ void on_mouse_button(GLFWwindow *window, int button, int action, int mods) {
                         } else {
                             if (sel_item->w == inventory.holding.w) {
                                 //Into same type
-                                if (sel_item->count < 64) {
+                                if (sel_item->count <= item_max_quantity(sel_item->w)) {
                                     //Append with one
                                     sel_item->count ++;
 
@@ -1806,8 +1806,8 @@ int main(int argc, char **argv) {
                 inv_item->w = 0;
             }
         } else {
-            if (inv_item->count == INVENTORY_UNLIMITED || inv_item->count > 64) {
-                inv_item->count = 64;
+            if (inv_item->count == INVENTORY_UNLIMITED || inv_item->count > item_max_quantity(inv_item->w)) {
+                inv_item->count = item_max_quantity(inv_item->w);
             }
         }
         if (inv_item->count <= 0) {
@@ -2087,7 +2087,7 @@ int main(int argc, char **argv) {
                 drop = 0;
                 int amount = 1;
                 if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL))
-                    amount = 64;
+                    amount = item_max_quantity(inventory.items[inventory.selected].w);
 
                 if (inventory.items[inventory.selected].count != INVENTORY_UNLIMITED) {
                     inventory.items[inventory.selected].count -= amount;
