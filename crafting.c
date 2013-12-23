@@ -27,6 +27,7 @@ void init_crafting() {
     recipes[recipe_count].ids = calloc(1, sizeof(int));
     recipes[recipe_count].ids[0] = Dirt.id;
     recipe_count ++;
+    //-------------------------------------------------
     recipes[recipe_count] = (Recipe){
         "   "
         " 0 "
@@ -34,6 +35,51 @@ void init_crafting() {
         NULL, Snow.id, 2};
     recipes[recipe_count].ids = calloc(1, sizeof(int));
     recipes[recipe_count].ids[0] = Dirt.id;
+    recipe_count ++;
+    //-------------------------------------------------
+    recipes[recipe_count] = (Recipe){
+        "   "
+        " 0 "
+        "   ",
+        NULL, Stone.id, 1};
+    recipes[recipe_count].ids = calloc(1, sizeof(int));
+    recipes[recipe_count].ids[0] = Cobblestone.id;
+    recipe_count ++;
+    //-------------------------------------------------
+    recipes[recipe_count] = (Recipe){
+        "   "
+        " 00"
+        " 00",
+        NULL, LightSlab.id, 4};
+    recipes[recipe_count].ids = calloc(1, sizeof(int));
+    recipes[recipe_count].ids[0] = Stone.id;
+    recipe_count ++;
+    //-------------------------------------------------
+    recipes[recipe_count] = (Recipe){
+        "   "
+        "   "
+        "000",
+        NULL, Slab.id, 3};
+    recipes[recipe_count].ids = calloc(1, sizeof(int));
+    recipes[recipe_count].ids[0] = Stone.id;
+    recipe_count ++;
+    //-------------------------------------------------
+    recipes[recipe_count] = (Recipe){
+        "   "
+        " 0 "
+        "   ",
+        NULL, DarkSlab.id, 1};
+    recipes[recipe_count].ids = calloc(1, sizeof(int));
+    recipes[recipe_count].ids[0] = LightSlab.id;
+    recipe_count ++;
+    //-------------------------------------------------
+    recipes[recipe_count] = (Recipe){
+        "   "
+        " 0 "
+        "   ",
+        NULL, LightSlab.id, 1};
+    recipes[recipe_count].ids = calloc(1, sizeof(int));
+    recipes[recipe_count].ids[0] = DarkSlab.id;
     recipe_count ++;
 }
 

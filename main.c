@@ -1383,15 +1383,28 @@ void on_mouse_button(GLFWwindow *window, int button, int action, int mods) {
                 int sel = mouse_to_inventory(width - inv_width_offset, height, mx, my - inv_height_offset, INVENTORY_ITEM_SIZE * 1.5);
                 Item *sel_item = get_inventory_item_ptr(sel);
 
-                if (inventory.holding.count == 0) {
-                    if (sel != -1) {
-                        //Pick up
-                        if (sel_item == &inventory.crafted) {
-                            //CRAFTING MAGIC
-                            if (sel_item->count > 0) {
-                                //TODO: SOMETHING
+                if (sel_item == &inventory.crafted) {
+                    //CRAFTING MAGIC
+                    if (sel_item->count > 0) {
+                        if ((inventory.holding.w == sel_item->w || inventory.holding.w == 0) && inventory.holding.count + sel_item->count < 64) {
+                            //Append to holding
+                            inventory.holding.count += sel_item->count;
+                            inventory.holding.w = sel_item->w;
+
+                            //Take out one from all crafting spots
+                            for (int i = 0; i < INVENTORY_CRAFT_ITEMS; i ++) {
+                                Item *craft_item = get_inventory_item_ptr(i + INVENTORY_ITEMS);
+                                craft_item->count --;
+                                if (craft_item->count <= 0) {
+                                    craft_item->w = 0;
+                                    craft_item->count = 0;
+                                }
                             }
                         }
+                    }
+                } else if (inventory.holding.count == 0) {
+                    if (sel != -1) {
+                        //Pick up
                         inventory.holding.count = sel_item->count;
                         inventory.holding.w = sel_item->w;
                         sel_item->count = 0;
