@@ -1128,7 +1128,7 @@ void render_crafting_texts(Attrib *attrib, float x, float y, float n) {
             if (block.w == 0)
                 continue;
 
-            if (block.count == 0)
+            if (block.count <= 1)
                 continue;
 
             /* 1  ...  0  ... -1 */
@@ -1142,7 +1142,7 @@ void render_crafting_texts(Attrib *attrib, float x, float y, float n) {
         }
     }
     Item block = inventory.crafted;
-    if (block.w != 0) {
+    if (block.w != 0 && block.count > 1) {
         float sep = INVENTORY_ITEM_SIZE * 1.5;
         float tx = x + sep;
         float ty = y == 0 ? sep / 3 : y - sep / 3;

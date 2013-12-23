@@ -4,9 +4,9 @@
 
 #define define_block(d, c, h, b, p, t, s, q, m, y) \
 { item_types[item_count] = (ItemType){item_count, d, c, h, b, p, t, s, q, m, NULL, NULL, 0, y}; item_count ++; }
-#define define_item(h, b, p, t, s, q, m, ac, y) \
+#define define_item(q, ac) \
 {\
-item_types[item_count] = (ItemType){item_count, 0, 0, h, b, p, t, s, q, m, NULL, NULL, ac, y}; \
+item_types[item_count] = (ItemType){item_count, 0, 0, 0.0, 0, 0, 0, 0, q, ItemMaterialTypeNone, NULL, NULL, ac, ItemRenderTypeItem}; \
 item_types[item_count].affects = calloc(ac, sizeof(ItemMaterialType)); \
 item_types[item_count].affections = calloc(ac, sizeof(double)); \
 item_count ++; \
@@ -22,7 +22,7 @@ void init_items() {
     item_count = -1;
 
     //  d = drop, dc = drop count, h = hardness, b = breakable, p = placeable, t = transparent, s = solid, q = max quantity, m = material, y = type
-    //  		 define_block(         d,dc,   h, b, p, t, s,  q, m,                     y                 );
+    //  		     define_block(         d,dc,   h, b, p, t, s,  q, m,                     y                 );
     /* -1 Unknown */ define_block(item_count, 0, 0.0, 0, 0, 1, 0,  0, ItemMaterialTypeNone,  ItemRenderTypeNone);
     /*  0 Air     */ define_block(item_count, 0, 0.0, 0, 0, 1, 0,  0, ItemMaterialTypeNone,  ItemRenderTypeNone);
     /*  1 Grass   */ define_block(         7, 1, 0.6, 1, 1, 0, 1, 64, ItemMaterialTypeSoil,  ItemRenderTypeBlock);
@@ -51,18 +51,22 @@ void init_items() {
     /* 24 Flower7 */ define_block(item_count, 1, 0.0, 1, 1, 1, 0, 64, ItemMaterialTypePlant, ItemRenderTypePlant);
     while (item_count < 256)
         define_item_null();
-    /* 256 Pickaxe */ define_item(0.0, 0, 0, 0, 0,  1, ItemMaterialTypeNone, 1, ItemRenderTypeItem);
+
+    // q = max quantity, ac = affection count
+    //                define_item(q,ac);
+    /* 256 Pickaxe */ define_item(1, 1);
     item_types[item_count - 1].affects[0] = ItemMaterialTypeStone;
     item_types[item_count - 1].affections[0] = 0.3333;
-    /* 257 Shovel  */ define_item(0.0, 0, 0, 0, 0,  1, ItemMaterialTypeNone, 1, ItemRenderTypeItem);
+    /* 257 Shovel  */ define_item(1, 1);
     item_types[item_count - 1].affects[0] = ItemMaterialTypeSoil;
     item_types[item_count - 1].affections[0] = 0.3333;
-    /* 258 Axe     */ define_item(0.0, 0, 0, 0, 0,  1, ItemMaterialTypeNone, 1, ItemRenderTypeItem);
+    /* 258 Axe     */ define_item(1, 1);
     item_types[item_count - 1].affects[0] = ItemMaterialTypeWood;
     item_types[item_count - 1].affections[0] = 0.3333;
-    /* 259 Sword   */ define_item(0.0, 0, 0, 0, 0,  1, ItemMaterialTypeNone, 1, ItemRenderTypeItem);
+    /* 259 Sword   */ define_item(1, 1);
     item_types[item_count - 1].affects[0] = ItemMaterialTypePlant;
     item_types[item_count - 1].affections[0] = 0.3333;
+    /* 260 Stick   */ define_item(1, 0);
 }
 
 ItemType get_item(int id) {

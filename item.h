@@ -86,5 +86,6 @@ int is_placeable(int w);
 #define Shovel      get_item(257)
 #define Axe         get_item(258)
 #define Sword       get_item(259)
+#define Stick       get_item(260)
 
 #endif /* item_h */

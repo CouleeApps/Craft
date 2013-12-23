@@ -81,6 +81,62 @@ void init_crafting() {
     recipes[recipe_count].ids = calloc(1, sizeof(int));
     recipes[recipe_count].ids[0] = DarkSlab.id;
     recipe_count ++;
+    //-------------------------------------------------
+    recipes[recipe_count] = (Recipe){
+        "   "
+        " 0 "
+        "   ",
+        NULL, Plank.id, 4};
+    recipes[recipe_count].ids = calloc(1, sizeof(int));
+    recipes[recipe_count].ids[0] = Wood.id;
+    recipe_count ++;
+    //-------------------------------------------------
+    recipes[recipe_count] = (Recipe){
+        "   "
+        " 0 "
+        "   ",
+        NULL, Glass.id, 1};
+    recipes[recipe_count].ids = calloc(1, sizeof(int));
+    recipes[recipe_count].ids[0] = Sand.id;
+    recipe_count ++;
+    //-------------------------------------------------
+    recipes[recipe_count] = (Recipe){
+        "000"
+        "0 0"
+        "000",
+        NULL, WoodBox.id, 8};
+    recipes[recipe_count].ids = calloc(1, sizeof(int));
+    recipes[recipe_count].ids[0] = Plank.id;
+    recipe_count ++;
+    //-------------------------------------------------
+    recipes[recipe_count] = (Recipe){
+        " 1 "
+        "101"
+        " 1 ",
+        NULL, Brick.id, 4};
+    recipes[recipe_count].ids = calloc(2, sizeof(int));
+    recipes[recipe_count].ids[0] = Sand.id;
+    recipes[recipe_count].ids[1] = Cobblestone.id;
+    recipe_count ++;
+    //-------------------------------------------------
+    recipes[recipe_count] = (Recipe){
+        "   "
+        " 0 "
+        " 0 ",
+        NULL, Stick.id, 4};
+    recipes[recipe_count].ids = calloc(1, sizeof(int));
+    recipes[recipe_count].ids[0] = Plank.id;
+    recipe_count ++;
+    //-------------------------------------------------
+    recipes[recipe_count] = (Recipe){
+        "111"
+        " 0 "
+        " 0 ",
+        NULL, Pickaxe.id, 1};
+    recipes[recipe_count].ids = calloc(2, sizeof(int));
+    recipes[recipe_count].ids[0] = Stick.id;
+    recipes[recipe_count].ids[1] = Cobblestone.id;
+    recipe_count ++;
 }
 
 Item get_crafting_result(Item *input) {
