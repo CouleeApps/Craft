@@ -19,6 +19,18 @@ void init_crafting() {
     recipe_count = 0;
     recipes = calloc(256, sizeof(Recipe));
 
+    /*
+     recipes[recipe_count] = (Recipe){
+         "111"
+         " 0 "
+         " 0 ",
+         NULL, Output_Item.id, 1};
+     recipes[recipe_count].ids = calloc(number_of_unique_items, sizeof(int));
+     recipes[recipe_count].ids[0] = Unique_Item_0.id;
+     recipes[recipe_count].ids[1] = Unique_Item_1.id;
+     recipe_count ++;
+     */
+
     recipes[recipe_count] = (Recipe){
         "   "
         " 0 "
@@ -166,6 +178,26 @@ void init_crafting() {
     recipes[recipe_count].ids = calloc(2, sizeof(int));
     recipes[recipe_count].ids[0] = Stick.id;
     recipes[recipe_count].ids[1] = Cobblestone.id;
+    recipe_count ++;
+    //-------------------------------------------------
+    recipes[recipe_count] = (Recipe){
+        "   "
+        " 1 "
+        " 0 ",
+        NULL, Grass.id, 3};
+    recipes[recipe_count].ids = calloc(2, sizeof(int));
+    recipes[recipe_count].ids[0] = Dirt.id;
+    recipes[recipe_count].ids[1] = Leaf.id;
+    recipe_count ++;
+    //-------------------------------------------------
+    recipes[recipe_count] = (Recipe){
+        "   "
+        " 1 "
+        " 0 ",
+        NULL, Snow.id, 3};
+    recipes[recipe_count].ids = calloc(2, sizeof(int));
+    recipes[recipe_count].ids[0] = Dirt.id;
+    recipes[recipe_count].ids[1] = Sand.id;
     recipe_count ++;
 }
 
