@@ -1663,6 +1663,11 @@ int main(int argc, char **argv) {
             db_commit();
         }
 
+        //Inv offsets
+        int inv_width_offset = (observe2 ? 288 : 0);
+        //Height is from bottom
+        int inv_height_offset = 128;
+
         // HANDLE MOUSE INPUT //
         if (exclusive && (px || py)) {
             double mx, my;
@@ -1691,8 +1696,7 @@ int main(int argc, char **argv) {
         int sx = 0;
 
         if (inventory_screen) {
-            int inv_offset = (observe2 ? 288 : 0);
-            int sel = mouse_to_inventory(width - inv_offset, height, px, py, INVENTORY_ITEM_SIZE * 1.5);
+            int sel = mouse_to_inventory(width - inv_width_offset, height, px, py - inv_height_offset, INVENTORY_ITEM_SIZE * 1.5);
             inventory.highlighted = sel;
         } else {
             if (!typing) {
@@ -2067,12 +2071,10 @@ int main(int argc, char **argv) {
         }
         // RENDER INVENTORY //
 
-        int inv_offset = (observe2 ? 288 : 0);
-
-        render_inventory(&inventory_attrib, &block_attrib, &text_attrib, &item_attrib, (width - inv_offset) / 2, INVENTORY_ITEM_SIZE, INVENTORY_ITEM_SIZE * 1.5, inventory.selected);
+        render_inventory(&inventory_attrib, &block_attrib, &text_attrib, &item_attrib, (width - inv_width_offset) / 2, INVENTORY_ITEM_SIZE, INVENTORY_ITEM_SIZE * 1.5, inventory.selected);
 
         if (inventory_screen) {
-            render_inventory_screen(&inventory_attrib, &block_attrib, &text_attrib, &item_attrib, (width - inv_offset) / 2, height / 2, INVENTORY_ITEM_SIZE * 1.5, inventory.highlighted);
+            render_inventory_screen(&inventory_attrib, &block_attrib, &text_attrib, &item_attrib, (width - inv_width_offset) / 2, (height / 2) - inv_height_offset, INVENTORY_ITEM_SIZE * 1.5, inventory.highlighted);
             if (inventory.holding.count > 0) {
                 render_inventory_held(&block_attrib, &text_attrib, &item_attrib, px, py, INVENTORY_ITEM_SIZE * 1.5);
             }
