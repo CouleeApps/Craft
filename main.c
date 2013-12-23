@@ -1793,68 +1793,6 @@ int main(int argc, char **argv) {
     }
 
     scale = get_scale_factor();
-    int has_pick = 0, has_shovel = 0, has_axe = 0, has_sword = 0;
-
-    for (int item = 0; item < INVENTORY_SLOTS * INVENTORY_ROWS; item ++) {
-        Item *inv_item = get_inventory_item_ptr(item);
-        if (CREATIVE_MODE) {
-            if (is_selectable(item + 1)) {
-                inv_item->count = INVENTORY_UNLIMITED;
-                inv_item->w = item + 1;
-            } else {
-                inv_item->count = 0;
-                inv_item->w = 0;
-            }
-        } else {
-            if (inv_item->count == INVENTORY_UNLIMITED || inv_item->count > item_max_quantity(inv_item->w)) {
-                inv_item->count = item_max_quantity(inv_item->w);
-            }
-        }
-        if (inv_item->count <= 0) {
-            inv_item->count = 0;
-            inv_item->w = 0;
-        }
-        if (inv_item->w == 256)
-            has_pick = 1;
-        if (inv_item->w == 257)
-            has_shovel = 1;
-        if (inv_item->w == 258)
-            has_axe = 1;
-        if (inv_item->w == 25)
-            has_sword = 1;
-    }
-    if (!has_pick) {
-        int slot = find_usable_inventory_slot(256);
-        if (slot != -1) {
-            Item *inv_item = get_inventory_item_ptr(slot);
-            inv_item->w = 256;
-            inv_item->count = 1;
-        }
-    }
-    if (!has_shovel) {
-        int slot = find_usable_inventory_slot(257);
-        if (slot != -1) {
-            Item *inv_item = get_inventory_item_ptr(slot);
-            inv_item->w = 257;
-            inv_item->count = 1;
-        }
-    }
-    if (!has_axe) {
-        int slot = find_usable_inventory_slot(258);
-        if (slot != -1) {
-            Item *inv_item = get_inventory_item_ptr(slot);
-            inv_item->w = 258;
-            inv_item->count = 1;
-        }
-    }
-    if (!has_sword) {
-        int slot = find_usable_inventory_slot(259);
-        if (slot != -1) {
-            Item *inv_item = get_inventory_item_ptr(slot);
-            inv_item->w = 259;
-            inv_item->count = 1;
-        }
-    }
 
     glfwGetCursorPos(window, &px, &py);
     double previous = glfwGetTime();

@@ -137,6 +137,36 @@ void init_crafting() {
     recipes[recipe_count].ids[0] = Stick.id;
     recipes[recipe_count].ids[1] = Cobblestone.id;
     recipe_count ++;
+    //-------------------------------------------------
+    recipes[recipe_count] = (Recipe){
+        "11 "
+        "10 "
+        " 0 ",
+        NULL, Axe.id, 1};
+    recipes[recipe_count].ids = calloc(2, sizeof(int));
+    recipes[recipe_count].ids[0] = Stick.id;
+    recipes[recipe_count].ids[1] = Cobblestone.id;
+    recipe_count ++;
+    //-------------------------------------------------
+    recipes[recipe_count] = (Recipe){
+        " 1 "
+        " 0 "
+        " 0 ",
+        NULL, Shovel.id, 1};
+    recipes[recipe_count].ids = calloc(2, sizeof(int));
+    recipes[recipe_count].ids[0] = Stick.id;
+    recipes[recipe_count].ids[1] = Cobblestone.id;
+    recipe_count ++;
+    //-------------------------------------------------
+    recipes[recipe_count] = (Recipe){
+        " 1 "
+        " 1 "
+        " 0 ",
+        NULL, Sword.id, 1};
+    recipes[recipe_count].ids = calloc(2, sizeof(int));
+    recipes[recipe_count].ids[0] = Stick.id;
+    recipes[recipe_count].ids[1] = Cobblestone.id;
+    recipe_count ++;
 }
 
 Item get_crafting_result(Item *input) {
