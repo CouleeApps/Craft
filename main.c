@@ -227,6 +227,26 @@ GLuint gen_inventory_buffers(float x, float y, float n, int sel) {
     return gen_faces(4, length, data);
 }
 
+GLuint gen_crafting_buffers(float x, float y, float n, int sel) {
+    int length = 3;
+    int rects = (length * length) + 1;
+    GLfloat *data = malloc_faces(4, rects);
+    y -= n * (length - 1) / 2;
+    for (int j = 0; j < length; j ++) {
+        x -= n * length;
+        for (int i = 0; i < length; i ++) {
+            make_inventory(
+                data + (i + j*length) * 24,
+                x, y, n / 2, n / 2, sel == (i + j * length) ? 1 : 0);
+            x += n;
+        }
+        y += n;
+    }
+    make_inventory(
+        data + 9 * 24, x + n, y - (n * 2), n / 2, n / 2, sel == 9);
+    return gen_faces(4, rects, data);
+}
+
 void draw_triangles_3d(Attrib *attrib, GLuint buffer, int count) {
     glBindBuffer(GL_ARRAY_BUFFER, buffer);
     glEnableVertexAttribArray(attrib->position);
@@ -919,6 +939,20 @@ void render_text(
     del_buffer(buffer);
 }
 
+void render_crafting_grid(Attrib *attrib, float x, float y, float n, int sel) {
+    float matrix[16];
+    set_matrix_2d(matrix, width, height);
+    glClear(GL_DEPTH_BUFFER_BIT);
+    glUseProgram(attrib->program);
+    glUniformMatrix4fv(attrib->matrix, 1, GL_FALSE, matrix);
+    glUniform1i(attrib->sampler, InventoryTexture.index);
+
+    GLuint buffer = gen_crafting_buffers(x, y, n, sel);
+
+    draw_inventory(attrib, buffer, 10);
+    del_buffer(buffer);
+}
+
 void render_inventory_bar(Attrib *attrib, float x, float y, float n, int sel) {
     float matrix[16];
     set_matrix_2d(matrix, width, height);
@@ -1051,6 +1085,8 @@ void render_inventory_screen(Attrib *window_attrib, Attrib *block_attrib, Attrib
         glClear(GL_DEPTH_BUFFER_BIT);
         render_inventory_texts(text_attrib, x, y + n*row, n, row);
     }
+
+    render_crafting_grid(window_attrib, x + n * 3, y + n * 6, n, sel - (INVENTORY_SLOTS * INVENTORY_ROWS));
 }
 
 void render_inventory_held(Attrib *block_attrib, Attrib *text_attrib, Attrib *item_attrib,
@@ -1073,8 +1109,15 @@ int mouse_to_inventory(int screen_width, int screen_height, float x, float y, fl
     int xcell = round((INVENTORY_SLOTS - 1) / 2. + ((x - screen_width / 2.) / n));
     int ycell = 0.5 - (y - screen_height / 2.) / n;
 
-    if (xcell < 0 || ycell < 0 || xcell >= INVENTORY_SLOTS || ycell >= INVENTORY_ROWS)
+    if (xcell < 0 || ycell < 0 || xcell >= INVENTORY_SLOTS || ycell >= INVENTORY_ROWS) {
+        //Check for crafting grid
+        //4-6, 5-7; 8,6
+        if (xcell >= 4 && xcell <= 6 && ycell >= 5 && ycell <= 7)
+            return (INVENTORY_ROWS * INVENTORY_SLOTS) + (xcell - 4 + ((ycell - 5) * 3));
+        if (xcell == 8 && ycell == 6)
+            return (INVENTORY_ROWS * INVENTORY_SLOTS) + 9;
         return -1;
+    }
 
     return xcell + (ycell * INVENTORY_SLOTS);
 }
@@ -1199,6 +1242,11 @@ void on_mouse_button(GLFWwindow *window, int button, int action, int mods) {
     if (action != GLFW_PRESS) {
         return;
     }
+    //Inv offsets
+    int inv_width_offset = (observe2 ? 288 : 0);
+    //Height is from bottom
+    int inv_height_offset = INVENTORY_ITEM_SIZE * 5;
+
     if (button == GLFW_MOUSE_BUTTON_LEFT) {
         if (exclusive) {
             if (mods & GLFW_MOD_SUPER) {
@@ -1213,8 +1261,7 @@ void on_mouse_button(GLFWwindow *window, int button, int action, int mods) {
                 double mx, my;
                 glfwGetCursorPos(window, &mx, &my);
 
-                int inv_offset = (observe2 ? 288 : 0);
-                int sel = mouse_to_inventory(width - inv_offset, height, mx, my, INVENTORY_ITEM_SIZE * 1.5);
+                int sel = mouse_to_inventory(width - inv_width_offset, height, mx, my - inv_height_offset, INVENTORY_ITEM_SIZE * 1.5);
                 if (inventory.holding.count == 0) {
                     if (sel != -1) {
                         //Pick up
@@ -1275,8 +1322,7 @@ void on_mouse_button(GLFWwindow *window, int button, int action, int mods) {
             double mx, my;
             glfwGetCursorPos(window, &mx, &my);
 
-            int inv_offset = (observe2 ? 288 : 0);
-            int sel = mouse_to_inventory(width - inv_offset, height, mx, my, INVENTORY_ITEM_SIZE * 1.5);
+            int sel = mouse_to_inventory(width - inv_width_offset, height, mx, my - inv_height_offset, INVENTORY_ITEM_SIZE * 1.5);
             if (inventory.items[sel].count != INVENTORY_UNLIMITED) {
                 if (inventory.holding.count == 0) {
                     if (sel != -1) {
@@ -1666,7 +1712,7 @@ int main(int argc, char **argv) {
         //Inv offsets
         int inv_width_offset = (observe2 ? 288 : 0);
         //Height is from bottom
-        int inv_height_offset = 128;
+        int inv_height_offset = INVENTORY_ITEM_SIZE * 5;
 
         // HANDLE MOUSE INPUT //
         if (exclusive && (px || py)) {
