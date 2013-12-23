@@ -21,6 +21,7 @@
 #include "util.h"
 #include "world.h"
 #include "item.h"
+#include "crafting.h"
 
 #define MAX_CHUNKS 1024
 #define MAX_PLAYERS 128
@@ -1385,6 +1386,12 @@ void on_mouse_button(GLFWwindow *window, int button, int action, int mods) {
                 if (inventory.holding.count == 0) {
                     if (sel != -1) {
                         //Pick up
+                        if (sel_item == &inventory.crafted) {
+                            //CRAFTING MAGIC
+                            if (sel_item->count > 0) {
+                                //TODO: SOMETHING
+                            }
+                        }
                         inventory.holding.count = sel_item->count;
                         inventory.holding.w = sel_item->w;
                         sel_item->count = 0;
@@ -1503,6 +1510,7 @@ void on_mouse_button(GLFWwindow *window, int button, int action, int mods) {
             //TODO: something
         }
     }
+    inventory.crafted = get_crafting_result(inventory.crafting);
 }
 
 Item get_current_item() {
@@ -1572,6 +1580,7 @@ int main(int argc, char **argv) {
     srand(time(NULL));
     rand();
     init_items();
+    init_crafting();
     if (argc == 2 || argc == 3) {
         char *hostname = argv[1];
         int port = DEFAULT_PORT;

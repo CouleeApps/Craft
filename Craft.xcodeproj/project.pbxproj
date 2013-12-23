@@ -14,6 +14,7 @@
 		B51C900B1867E0DB00432518 /* glxew.h in Headers */ = {isa = PBXBuildFile; fileRef = B51C8FF81867E0A800432518 /* glxew.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		B51C900C1867E0DD00432518 /* wglew.h in Headers */ = {isa = PBXBuildFile; fileRef = B51C8FF91867E0A800432518 /* wglew.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		B51C900F1867E15800432518 /* libglew.a in Frameworks */ = {isa = PBXBuildFile; fileRef = B51C90031867E0B500432518 /* libglew.a */; };
+		B51C90111867FB9700432518 /* crafting.c in Sources */ = {isa = PBXBuildFile; fileRef = B51C90101867FB9700432518 /* crafting.c */; };
 		B537CD57185EC69F00B652DD /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B537CD56185EC69F00B652DD /* CoreGraphics.framework */; };
 		B537CD59185EC6A300B652DD /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B537CD58185EC6A300B652DD /* AppKit.framework */; };
 		B537CD5B185EC6A700B652DD /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B537CD5A185EC6A700B652DD /* Foundation.framework */; };
@@ -135,6 +136,8 @@
 		B51C8FFD1867E0A800432518 /* glewinfo.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = glewinfo.c; sourceTree = "<group>"; };
 		B51C8FFE1867E0A800432518 /* visualinfo.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = visualinfo.c; sourceTree = "<group>"; };
 		B51C90031867E0B500432518 /* libglew.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libglew.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		B51C90101867FB9700432518 /* crafting.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = crafting.c; sourceTree = "<group>"; };
+		B51C90121867FBA200432518 /* crafting.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = crafting.h; sourceTree = "<group>"; };
 		B537CD56185EC69F00B652DD /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
 		B537CD58185EC6A300B652DD /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
 		B537CD5A185EC6A700B652DD /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -629,6 +632,8 @@
 				B58A758F185EBF8100655BD9 /* client.c */,
 				B58A7590185EBF8100655BD9 /* client.h */,
 				B58A7591185EBF8100655BD9 /* config.h */,
+				B51C90101867FB9700432518 /* crafting.c */,
+				B51C90121867FBA200432518 /* crafting.h */,
 				B58A7592185EBF8100655BD9 /* cube.c */,
 				B58A7593185EBF8100655BD9 /* cube.h */,
 				B58A7594185EBF8100655BD9 /* db.c */,
@@ -911,6 +916,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				B58A7649185EC12A00655BD9 /* main.c in Sources */,
+				B51C90111867FB9700432518 /* crafting.c in Sources */,
 				B5DD996C1866B54300634CC0 /* item.c in Sources */,
 				B58A7641185EC09D00655BD9 /* client.c in Sources */,
 				B58A7642185EC09D00655BD9 /* cube.c in Sources */,
