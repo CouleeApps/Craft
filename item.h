@@ -52,6 +52,7 @@ int is_obstacle(int w);
 int is_transparent(int w);
 int is_destructable(int w);
 int is_selectable(int w);
+int is_placeable(int w);
 
 /* BLOCKS */
 #define Unknown     get_item(-1)

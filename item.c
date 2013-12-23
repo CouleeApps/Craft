@@ -147,3 +147,7 @@ int is_destructable(int w) {
 int is_selectable(int w) {
     return item_placeable(w);
 }
+
+int is_placeable(int w) {
+    return item_placeable(w);
+}

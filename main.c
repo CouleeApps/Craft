@@ -33,6 +33,7 @@
 #define LEFT 0
 #define CENTER 1
 #define RIGHT 2
+#define INVENTORY_ITEMS (INVENTORY_SLOTS * INVENTORY_ROWS) + 10
 
 typedef struct {
     int index;
@@ -1007,6 +1008,8 @@ void render_inventory_item(Attrib *attrib, Item item, float x, float y, float si
     } else {
         glUniform3f(attrib->camera, 0, 0, 5);
         glUniform1f(attrib->timer, M_PI_2);
+        glUniform1i(attrib->extra1, SkyTexture.index);
+        glUniform1f(attrib->extra2, M_PI_2);
         glUniform1i(attrib->sampler, BlockTexture.index);
         set_matrix_item(matrix, width, height, size, x, y);
     }
@@ -1031,6 +1034,43 @@ void render_inventory_item(Attrib *attrib, Item item, float x, float y, float si
     } else {
         draw_cube(attrib, buffer);
         del_buffer(buffer);
+    }
+}
+
+void render_crafting_items(Attrib *block_attrib, Attrib *item_attrib, float x, float y, float size) {
+    for (int row = 0; row < 3; row ++) {
+        for (int col = 0; col < 3; col ++) {
+            Item block = inventory.items[(INVENTORY_ROWS * INVENTORY_SLOTS) + (col + (row * 3))];
+
+            if (block.w == 0)
+                continue;
+
+            if (block.count == 0)
+                continue;
+
+            /* 1  ...  0  ... -1 */
+            /* 0 1 2 3 4 5 6 7 8 */
+            /* 1 ...  0  ...-1 */
+            /* 0 1 2 3 4 5 6 7 */
+            float slotoff = (col - 3) * 1.5;
+            float xpos = x + slotoff * size;
+            float ypos = y - (size * (is_item(block.w) ? 0.5 : 0)) + (((row - 1) * 1.5)) * size;
+
+            if (is_item(block.w))
+                render_inventory_item(item_attrib, block, xpos, ypos, size);
+            else
+                render_inventory_item(block_attrib, block, xpos, ypos, size * 0.75);
+        }
+    }
+    Item block = inventory.items[INVENTORY_ITEMS - 1];
+    if (block.w != 0) {
+        float xpos = x + (1 * size) * 1.5;
+        float ypos = y - (size * (is_item(block.w) ? 0.5 : 0));
+
+        if (is_item(block.w))
+            render_inventory_item(item_attrib, block, xpos, ypos, size);
+        else
+            render_inventory_item(block_attrib, block, xpos, ypos, size * 0.75);
     }
 }
 
@@ -1078,6 +1118,36 @@ void render_inventory_text(Attrib *attrib, Item item, float x, float y, float n)
         x, y, ts, text_buffer);
 }
 
+void render_crafting_texts(Attrib *attrib, float x, float y, float n) {
+    for (int row = 0; row < 3; row ++) {
+        for (int col = 0; col < 3; col ++) {
+            Item block = inventory.items[(INVENTORY_ROWS * INVENTORY_SLOTS) + (col + (row * 3))];
+
+            if (block.w == 0)
+                continue;
+
+            if (block.count == 0)
+                continue;
+
+            /* 1  ...  0  ... -1 */
+            /* 0 1 2 3 4 5 6 7 8 */
+            /* 1 ...  0  ...-1 */
+            /* 0 1 2 3 4 5 6 7 */
+            float sep = INVENTORY_ITEM_SIZE * 1.5;
+            float tx = x + (sep * (col - 3));
+            float ty = y + (sep * (row - 1)) - sep / 3;
+            render_inventory_text(attrib, block, tx, ty, n);
+        }
+    }
+    Item block = inventory.items[INVENTORY_ITEMS - 1];
+    if (block.w != 0) {
+        float sep = INVENTORY_ITEM_SIZE * 1.5;
+        float tx = x + sep;
+        float ty = y == 0 ? sep / 3 : y - sep / 3;
+        render_inventory_text(attrib, block, tx, ty, n);
+    }
+}
+
 void render_inventory_texts(Attrib *attrib, float x, float y, float n, int row) {
     for (int item = 0; item < INVENTORY_SLOTS; item ++) {
         Item block = inventory.items[item + (row * INVENTORY_SLOTS)];
@@ -1105,15 +1175,22 @@ void render_inventory(Attrib *window_attrib, Attrib *block_attrib, Attrib *text_
 
 void render_inventory_screen(Attrib *window_attrib, Attrib *block_attrib, Attrib *text_attrib, Attrib *item_attrib,
                       float x, float y, float n, int sel) {
-    for (int row = 0; row < INVENTORY_ROWS; row ++) {
+    for (int row = 0; row < INVENTORY_ROWS; row ++)
         render_inventory_bar(window_attrib, x, y + n*row, n, sel - (row * INVENTORY_SLOTS));
-        glClear(GL_DEPTH_BUFFER_BIT);
-        render_inventory_items(block_attrib, item_attrib, x, y + n*row, n / 1.5, row);
-        glClear(GL_DEPTH_BUFFER_BIT);
-        render_inventory_texts(text_attrib, x, y + n*row, n, row);
-    }
-
     render_crafting_grid(window_attrib, x + n * 3, y + n * 6, n, sel - (INVENTORY_SLOTS * INVENTORY_ROWS));
+
+    glClear(GL_DEPTH_BUFFER_BIT);
+
+    render_crafting_items(block_attrib, item_attrib, x + n * 3, y + n * 6, n / 1.5);
+    for (int row = 0; row < INVENTORY_ROWS; row ++)
+        render_inventory_items(block_attrib, item_attrib, x, y + n*row, n / 1.5, row);
+
+    glClear(GL_DEPTH_BUFFER_BIT);
+
+    render_crafting_texts(text_attrib, x + n * 3, y + n * 6, n / 1.5);
+    for (int row = 0; row < INVENTORY_ROWS; row ++)
+        render_inventory_texts(text_attrib, x, y + n*row, n, row);
+
 }
 
 void render_inventory_held(Attrib *block_attrib, Attrib *text_attrib, Attrib *item_attrib,
@@ -1121,7 +1198,7 @@ void render_inventory_held(Attrib *block_attrib, Attrib *text_attrib, Attrib *it
     if (is_item(inventory.holding.w))
         render_inventory_item(item_attrib, inventory.holding, x, (height - y) - (n / 1.5) * 0.5, n / 1.5);
     else
-        render_inventory_item(item_attrib, inventory.holding, x, height - y, (n / 1.5) * 0.75);
+        render_inventory_item(block_attrib, inventory.holding, x, height - y, (n / 1.5) * 0.75);
     glClear(GL_DEPTH_BUFFER_BIT);
 
     if (inventory.holding.count > 1) {
@@ -1652,9 +1729,9 @@ int main(int argc, char **argv) {
     double px = 0;
     double py = 0;
 
-    inventory.items = calloc(INVENTORY_SLOTS * INVENTORY_ROWS, sizeof(Item));
+    inventory.items = calloc(INVENTORY_ITEMS, sizeof(Item));
 
-    for (int item = 0; item < INVENTORY_SLOTS * INVENTORY_ROWS; item ++) {
+    for (int item = 0; item < INVENTORY_ITEMS; item ++) {
         inventory.items[item].count = 0;
         inventory.items[item].w     = 0;
     }
@@ -1907,7 +1984,7 @@ int main(int argc, char **argv) {
                 int hw = hit_test(1, x, y, z, rx, ry,
                     &hx, &hy, &hz);
                 if (hy > 0 && hy < 256 && is_obstacle(hw)) {
-                    if (get_current_count() > 0 &&
+                    if (get_current_count() > 0 && is_placeable(inventory.items[inventory.selected].w) &&
                         !player_intersects_block(2, x, y, z, hx, hy, hz)) {
 
                         set_block(hx, hy, hz, get_current_block(), 0);
