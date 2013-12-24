@@ -37,6 +37,13 @@
 #define INVENTORY_ITEMS (INVENTORY_SLOTS * INVENTORY_ROWS)
 #define INVENTORY_CRAFT_ITEMS (INVENTORY_CRAFT_SIZE * INVENTORY_CRAFT_SIZE)
 
+typedef enum {
+    NoInventory = 0,
+    PlayerInventory = 1,
+    WorkbenchInventory = 2,
+    FurnaceInventory = 3
+} InventoryScreen;
+
 typedef struct {
     int index;
     int glIndex;
@@ -109,7 +116,7 @@ static float fov = 65;
 static int typing = 0;
 static char typing_buffer[MAX_TEXT_LENGTH] = {0};
 static Inventory inventory;
-static int inventory_screen = 0;
+static InventoryScreen inventory_screen = 0;
 static int inventory_toggle = 0;
 static Entry breaking_block;
 static double breaking_start;
@@ -1318,7 +1325,7 @@ void on_key(GLFWwindow *window, int key, int scancode, int action, int mods) {
             }
         }
         if (key == CRAFT_KEY_INVENTORY) {
-            inventory_toggle = 1;
+            inventory_toggle = PlayerInventory;
         }
     }
 }
@@ -1406,7 +1413,7 @@ void on_mouse_button(GLFWwindow *window, int button, int action, int mods) {
                 double mx, my;
                 glfwGetCursorPos(window, &mx, &my);
 
-                int sel = mouse_to_inventory(width - inv_width_offset, height, mx, my - inv_height_offset, INVENTORY_ITEM_SIZE * 1.5, (inventory_screen == 1 ? 2 : 3));
+                int sel = mouse_to_inventory(width - inv_width_offset, height, mx, my - inv_height_offset, INVENTORY_ITEM_SIZE * 1.5, (inventory_screen == PlayerInventory ? 2 : 3));
                 Item *sel_item = get_inventory_item_ptr(sel);
 
                 if (sel_item == &inventory.crafted) {
@@ -1488,7 +1495,7 @@ void on_mouse_button(GLFWwindow *window, int button, int action, int mods) {
             double mx, my;
             glfwGetCursorPos(window, &mx, &my);
 
-            int sel = mouse_to_inventory(width - inv_width_offset, height, mx, my - inv_height_offset, INVENTORY_ITEM_SIZE * 1.5, (inventory_screen == 1 ? 2 : 3));
+            int sel = mouse_to_inventory(width - inv_width_offset, height, mx, my - inv_height_offset, INVENTORY_ITEM_SIZE * 1.5, (inventory_screen == PlayerInventory ? 2 : 3));
             Item *sel_item = get_inventory_item_ptr(sel);
 
             if (sel_item->count != INVENTORY_UNLIMITED) {
@@ -1869,7 +1876,7 @@ int main(int argc, char **argv) {
         int sx = 0;
 
         if (inventory_screen) {
-            int sel = mouse_to_inventory(width - inv_width_offset, height, px, py - inv_height_offset, INVENTORY_ITEM_SIZE * 1.5, (inventory_screen == 1 ? 2 : 3));
+            int sel = mouse_to_inventory(width - inv_width_offset, height, px, py - inv_height_offset, INVENTORY_ITEM_SIZE * 1.5, (inventory_screen == PlayerInventory ? 2 : 3));
             inventory.highlighted = sel;
         } else {
             if (!typing) {
@@ -2004,7 +2011,7 @@ int main(int argc, char **argv) {
                     &hx, &hy, &hz);
                 if (hy > 0 && hy < 256 && is_obstacle(hw)) {
                     if (hw == Workbench.id) {
-                        inventory_toggle = 2;
+                        inventory_toggle = WorkbenchInventory;
                     } else {
                         if (get_current_count() > 0 && is_placeable(inventory.items[inventory.selected].w) &&
                             !player_intersects_block(2, x, y, z, hx, hy, hz)) {
@@ -2068,7 +2075,7 @@ int main(int argc, char **argv) {
         }
 
         if (inventory_toggle) {
-            inventory_screen = inventory_screen ? 0 : inventory_toggle;
+            inventory_screen = inventory_screen ? NoInventory : inventory_toggle;
             inventory_toggle = 0;
             exclusive = !inventory_screen;
             if (exclusive) {
@@ -2256,10 +2263,10 @@ int main(int argc, char **argv) {
 
         if (inventory_screen) {
             switch (inventory_screen) {
-            case 1:
+            case PlayerInventory:
                 render_craft_screen(&inventory_attrib, &block_attrib, &text_attrib, &item_attrib, (width / 2) + (box_size * 3), (height / 2) - inv_height_offset + (box_size * 5.5), box_size, inventory.highlighted - 36, 2);
                 break;
-            case 2:
+            case WorkbenchInventory:
                 render_craft_screen(&inventory_attrib, &block_attrib, &text_attrib, &item_attrib, (width / 2) + box_size, (height / 2) - inv_height_offset + (box_size * 6), box_size, inventory.highlighted - 36, 3);
                 break;
             default:
