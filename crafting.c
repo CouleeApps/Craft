@@ -263,8 +263,9 @@ Item get_crafting_result(Item *raw_input) {
             break;
     }
     //Left
-    int shift_left = 0;
-    for (int x = 0; x < 2; x ++) {
+    int shift_left = 0, shift_right = 0;
+    int *shift_dir = &shift_left;
+    for (int x = 0; x < 3; x ++) {
         int shift = 1;
 
         //If the col is empty
@@ -276,9 +277,9 @@ Item get_crafting_result(Item *raw_input) {
             }
         }
         if (shift)
-            shift_left ++;
+            (*shift_dir) ++;
         else
-            break;
+            shift_dir = &shift_right;
     }
 
     Item *input = calloc(9, sizeof(Item));
@@ -330,5 +331,53 @@ Item get_crafting_result(Item *raw_input) {
             return ret;
         }
     }
+
+    for (int y = 0; y < 3; y ++) {
+        int pos1 = (y * 3);
+        int pos2 = (y * 3) + 2 - (shift_right + shift_left);
+        //Swap them
+        Item store;
+        store.w = input[pos1].w;
+        store.count = input[pos1].count;
+        input[pos1].w = input[pos2].w;
+        input[pos1].count = input[pos2].count;
+        input[pos2].w = store.w;
+        input[pos2].count = store.count;
+    }
+
+    //Attempt again reversed
+    for (int rec = 0; rec < recipe_count; rec ++) {
+        Recipe recipe = recipes[rec];
+        int len = strlen(recipe.input_pattern);
+
+        int correct = 1;
+        for (int i = 0; i < len; i ++) {
+            char ch;
+            strncpy(&ch, recipe.input_pattern + i, sizeof(char));
+
+            int req_w = -1;
+            if (ch == ' ')
+                req_w = 0;
+            else if (ch > 47 && ch < 58)
+                req_w = recipe.ids[ch - 48];
+            else
+                printf("INVALID RECIPE INDEX: %c\n", ch);
+
+            int input_w = input[(i % 3) + (3*(2-(i / 3)))].w;
+
+            if (req_w != input_w) { //Nope
+                correct = 0;
+                break;
+            }
+        }
+
+        if (correct) {
+            Item ret;
+            ret.w = recipe.output_id;
+            ret.count = recipe.output_count;
+            return ret;
+        }
+    }
+
     return (Item){0};
 }
