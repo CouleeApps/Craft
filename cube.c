@@ -1,6 +1,7 @@
 #include <math.h>
 #include "cube.h"
 #include "matrix.h"
+#include "item.h"
 #include "util.h"
 
 void make_cube_faces(
@@ -157,7 +158,11 @@ void make_cube(
     if (data == NULL)
         return;
     int wleft, wright, wtop, wbottom, wfront, wback;
-    w--;
+    if (w >= Furnace.id) {
+        w -= Furnace.id;
+        w += 48;
+    } else
+        w--;
     wbottom = w;
     wleft = wright = wfront = wback = w + 16;
     wtop = w + 32;
@@ -199,7 +204,7 @@ void make_plant(
     float du, dv;
     w--;
     du = (w % 16) * s;
-    dv = (w / 16 * 3) * s;
+    dv = (w / 16 * 6) * s;
     float x, y, z;
     x = y = z = 0;
     // left

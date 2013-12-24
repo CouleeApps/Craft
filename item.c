@@ -49,6 +49,8 @@ void init_items() {
     /* 22 Flower5 */ define_block(item_count, 1, 0.0, 1, 1, 1, 0, 64, ItemMaterialTypePlant, ItemRenderTypePlant);
     /* 23 Flower6 */ define_block(item_count, 1, 0.0, 1, 1, 1, 0, 64, ItemMaterialTypePlant, ItemRenderTypePlant);
     /* 24 Flower7 */ define_block(item_count, 1, 0.0, 1, 1, 1, 0, 64, ItemMaterialTypePlant, ItemRenderTypePlant);
+    /* 25 Furnace */ define_block(item_count, 1, 3.0, 1, 1, 0, 1, 64, ItemMaterialTypeStone, ItemRenderTypeBlock);
+    /* 26 WBench  */ define_block(item_count, 1, 2.5, 1, 1, 0, 1, 64, ItemMaterialTypeWood,  ItemRenderTypeBlock);
     while (item_count < 256)
         define_item_null();
 

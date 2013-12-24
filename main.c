@@ -256,23 +256,23 @@ GLuint gen_inventory_buffers(float x, float y, float n, int sel) {
     return gen_faces(4, length, data);
 }
 
-GLuint gen_crafting_buffers(float x, float y, float n, int sel) {
-    int length = 3;
+GLuint gen_crafting_buffers(float x, float y, float n, int sel, int grid_size) {
+    int length = grid_size;
     int rects = (length * length) + 1;
     GLfloat *data = malloc_faces(4, rects);
-    y -= n * (length - 1) / 2;
+    y -= n * (length - 1.) / 2.;
     for (int j = 0; j < length; j ++) {
         x -= n * length;
         for (int i = 0; i < length; i ++) {
             make_inventory(
                 data + (i + j*length) * 24,
-                x, y, n / 2, n / 2, sel == (i + j * length) ? 1 : 0);
+                x, y, n / 2, n / 2, sel == (i + j * 3) ? 1 : 0);
             x += n;
         }
         y += n;
     }
     make_inventory(
-        data + 9 * 24, x + n, y - (n * 2), n / 2, n / 2, sel == 9);
+        data + (rects - 1) * 24, x + n, y - (n * ((grid_size + 1.) / 2.)), n / 2, n / 2, sel == 9);
     return gen_faces(4, rects, data);
 }
 
@@ -969,7 +969,7 @@ void render_text(
     del_buffer(buffer);
 }
 
-void render_crafting_grid(Attrib *attrib, float x, float y, float n, int sel) {
+void render_crafting_grid(Attrib *attrib, float x, float y, float n, int sel, int grid_size) {
     float matrix[16];
     set_matrix_2d(matrix, width, height);
     glClear(GL_DEPTH_BUFFER_BIT);
@@ -977,7 +977,7 @@ void render_crafting_grid(Attrib *attrib, float x, float y, float n, int sel) {
     glUniformMatrix4fv(attrib->matrix, 1, GL_FALSE, matrix);
     glUniform1i(attrib->sampler, InventoryTexture.index);
 
-    GLuint buffer = gen_crafting_buffers(x, y, n, sel);
+    GLuint buffer = gen_crafting_buffers(x, y, n, sel, grid_size);
 
     draw_inventory(attrib, buffer, 10);
     del_buffer(buffer);
@@ -1039,9 +1039,9 @@ void render_inventory_item(Attrib *attrib, Item item, float x, float y, float si
     }
 }
 
-void render_crafting_items(Attrib *block_attrib, Attrib *item_attrib, float x, float y, float size) {
-    for (int row = 0; row < 3; row ++) {
-        for (int col = 0; col < 3; col ++) {
+void render_crafting_items(Attrib *block_attrib, Attrib *item_attrib, float x, float y, float size, int grid_size) {
+    for (int row = 0; row < grid_size; row ++) {
+        for (int col = 0; col < grid_size; col ++) {
             Item block = inventory.crafting[col + (row * 3)];
 
             if (block.w == 0)
@@ -1054,9 +1054,9 @@ void render_crafting_items(Attrib *block_attrib, Attrib *item_attrib, float x, f
             /* 0 1 2 3 4 5 6 7 8 */
             /* 1 ...  0  ...-1 */
             /* 0 1 2 3 4 5 6 7 */
-            float slotoff = (col - 3) * 1.5;
+            float slotoff = (col - grid_size) * 1.5;
             float xpos = x + slotoff * size;
-            float ypos = y - (size * (is_item(block.w) ? 0.5 : 0)) + (((row - 1) * 1.5)) * size;
+            float ypos = y - (size * (is_item(block.w) ? 0.5 : 0)) + (((row - (grid_size - 1.) / 2.) * 1.5)) * size;
 
             if (is_item(block.w))
                 render_inventory_item(item_attrib, block, xpos, ypos, size);
@@ -1120,9 +1120,9 @@ void render_inventory_text(Attrib *attrib, Item item, float x, float y, float n)
         x, y, ts, text_buffer);
 }
 
-void render_crafting_texts(Attrib *attrib, float x, float y, float n) {
-    for (int row = 0; row < 3; row ++) {
-        for (int col = 0; col < 3; col ++) {
+void render_crafting_texts(Attrib *attrib, float x, float y, float n, int grid_size) {
+    for (int row = 0; row < grid_size; row ++) {
+        for (int col = 0; col < grid_size; col ++) {
             Item block = inventory.crafting[col + (row * 3)];
 
             if (block.w == 0)
@@ -1136,8 +1136,8 @@ void render_crafting_texts(Attrib *attrib, float x, float y, float n) {
             /* 1 ...  0  ...-1 */
             /* 0 1 2 3 4 5 6 7 */
             float sep = INVENTORY_ITEM_SIZE * 1.5;
-            float tx = x + (sep * (col - 3));
-            float ty = y + (sep * (row - 1)) - sep / 3;
+            float tx = x + (sep * (col - grid_size));
+            float ty = y + (sep * (row - (grid_size - 1.) / 2.)) - sep / grid_size;
             render_inventory_text(attrib, block, tx, ty, n);
         }
     }
@@ -1145,7 +1145,7 @@ void render_crafting_texts(Attrib *attrib, float x, float y, float n) {
     if (block.w != 0 && block.count > 1) {
         float sep = INVENTORY_ITEM_SIZE * 1.5;
         float tx = x + sep;
-        float ty = y == 0 ? sep / 3 : y - sep / 3;
+        float ty = y == 0 ? sep / grid_size : y - sep / grid_size;
         render_inventory_text(attrib, block, tx, ty, n);
     }
 }
@@ -1179,20 +1179,29 @@ void render_inventory_screen(Attrib *window_attrib, Attrib *block_attrib, Attrib
                       float x, float y, float n, int sel) {
     for (int row = 0; row < INVENTORY_ROWS; row ++)
         render_inventory_bar(window_attrib, x, y + n*row, n, sel - (row * INVENTORY_SLOTS));
-    render_crafting_grid(window_attrib, x + n * 3, y + n * 6, n, sel - (INVENTORY_SLOTS * INVENTORY_ROWS));
 
     glClear(GL_DEPTH_BUFFER_BIT);
 
-    render_crafting_items(block_attrib, item_attrib, x + n * 3, y + n * 6, n / 1.5);
     for (int row = 0; row < INVENTORY_ROWS; row ++)
         render_inventory_items(block_attrib, item_attrib, x, y + n*row, n / 1.5, row);
 
     glClear(GL_DEPTH_BUFFER_BIT);
 
-    render_crafting_texts(text_attrib, x + n * 3, y + n * 6, n / 1.5);
     for (int row = 0; row < INVENTORY_ROWS; row ++)
         render_inventory_texts(text_attrib, x, y + n*row, n, row);
+}
 
+void render_craft_screen(Attrib *window_attrib, Attrib *block_attrib, Attrib *text_attrib, Attrib *item_attrib,
+                         float x, float y, float n, int sel, int size) {
+    render_crafting_grid(window_attrib, x, y, n, sel, size);
+
+    glClear(GL_DEPTH_BUFFER_BIT);
+
+    render_crafting_items(block_attrib, item_attrib, x, y, n / 1.5, size);
+
+    glClear(GL_DEPTH_BUFFER_BIT);
+
+    render_crafting_texts(text_attrib, x, y, n / 1.5, size);
 }
 
 void render_inventory_held(Attrib *block_attrib, Attrib *text_attrib, Attrib *item_attrib,
@@ -1209,19 +1218,36 @@ void render_inventory_held(Attrib *block_attrib, Attrib *text_attrib, Attrib *it
     }
 }
 
-int mouse_to_inventory(int screen_width, int screen_height, float x, float y, float n) {
+float *mouse_to_grid(int screen_width, int screen_height, float x, float y, float n) {
     /* .. 0 .. 1 .. 2 .. 3 .. 4 .. 5 .. 6 .. 7 .. 8 .. */
     /* |---------------------------------------------| */
-    int xcell = round((INVENTORY_SLOTS - 1) / 2. + ((x - screen_width / 2.) / n));
-    int ycell = 0.5 - (y - screen_height / 2.) / n;
+    float xcell = (INVENTORY_SLOTS - 1) / 2. + ((x - screen_width / 2.) / n);
+    float ycell = 0.5 - (y - screen_height / 2.) / n;
+    float *ret = calloc(2, sizeof(float));
+    ret[0] = xcell;
+    ret[1] = ycell;
+    return ret;
+}
+
+int mouse_to_inventory(int screen_width, int screen_height, float x, float y, float n, float craft_size) {
+    float *grid = mouse_to_grid(screen_width, screen_height, x, y, n);
+    int xcell = round(grid[0]), ycell = floor(grid[1]);
 
     if (xcell < 0 || ycell < 0 || xcell >= INVENTORY_SLOTS || ycell >= INVENTORY_ROWS) {
         //Check for crafting grid
-        //4-6, 5-7; 8,6
-        if (xcell >= 4 && xcell <= 6 && ycell >= 5 && ycell <= 7)
-            return (INVENTORY_ROWS * INVENTORY_SLOTS) + (xcell - 4 + ((ycell - 5) * 3));
-        if (xcell == 8 && ycell == 6)
-            return (INVENTORY_ROWS * INVENTORY_SLOTS) + 9;
+        //3-5, 5-7; 8,6
+        if (craft_size == 2) {
+            if (xcell >= 5 && xcell <= 6 && ycell >= 5 && ycell <= 6)
+                return (INVENTORY_ROWS * INVENTORY_SLOTS) + (xcell - 5 + ((ycell - 5) * 3));
+            if (xcell == 8 && round(grid[1]) == 6)
+                return (INVENTORY_ROWS * INVENTORY_SLOTS) + 9;
+        }
+        if (craft_size == 3) {
+            if (xcell >= 2 && xcell <= 4 && ycell >= 5 && ycell <= 7)
+                return (INVENTORY_ROWS * INVENTORY_SLOTS) + (xcell - 2 + ((ycell - 5) * 3));
+            if (xcell == 6 && ycell == 6)
+                return (INVENTORY_ROWS * INVENTORY_SLOTS) + 9;
+        }
         return -1;
     }
 
@@ -1380,7 +1406,7 @@ void on_mouse_button(GLFWwindow *window, int button, int action, int mods) {
                 double mx, my;
                 glfwGetCursorPos(window, &mx, &my);
 
-                int sel = mouse_to_inventory(width - inv_width_offset, height, mx, my - inv_height_offset, INVENTORY_ITEM_SIZE * 1.5);
+                int sel = mouse_to_inventory(width - inv_width_offset, height, mx, my - inv_height_offset, INVENTORY_ITEM_SIZE * 1.5, (inventory_screen == 1 ? 2 : 3));
                 Item *sel_item = get_inventory_item_ptr(sel);
 
                 if (sel_item == &inventory.crafted) {
@@ -1462,7 +1488,7 @@ void on_mouse_button(GLFWwindow *window, int button, int action, int mods) {
             double mx, my;
             glfwGetCursorPos(window, &mx, &my);
 
-            int sel = mouse_to_inventory(width - inv_width_offset, height, mx, my - inv_height_offset, INVENTORY_ITEM_SIZE * 1.5);
+            int sel = mouse_to_inventory(width - inv_width_offset, height, mx, my - inv_height_offset, INVENTORY_ITEM_SIZE * 1.5, (inventory_screen == 1 ? 2 : 3));
             Item *sel_item = get_inventory_item_ptr(sel);
 
             if (sel_item->count != INVENTORY_UNLIMITED) {
@@ -1843,7 +1869,7 @@ int main(int argc, char **argv) {
         int sx = 0;
 
         if (inventory_screen) {
-            int sel = mouse_to_inventory(width - inv_width_offset, height, px, py - inv_height_offset, INVENTORY_ITEM_SIZE * 1.5);
+            int sel = mouse_to_inventory(width - inv_width_offset, height, px, py - inv_height_offset, INVENTORY_ITEM_SIZE * 1.5, (inventory_screen == 1 ? 2 : 3));
             inventory.highlighted = sel;
         } else {
             if (!typing) {
@@ -1977,16 +2003,20 @@ int main(int argc, char **argv) {
                 int hw = hit_test(1, x, y, z, rx, ry,
                     &hx, &hy, &hz);
                 if (hy > 0 && hy < 256 && is_obstacle(hw)) {
-                    if (get_current_count() > 0 && is_placeable(inventory.items[inventory.selected].w) &&
-                        !player_intersects_block(2, x, y, z, hx, hy, hz)) {
+                    if (hw == Workbench.id) {
+                        inventory_toggle = 2;
+                    } else {
+                        if (get_current_count() > 0 && is_placeable(inventory.items[inventory.selected].w) &&
+                            !player_intersects_block(2, x, y, z, hx, hy, hz)) {
 
-                        set_block(hx, hy, hz, get_current_block(), 0);
+                            set_block(hx, hy, hz, get_current_block(), 0);
 
-                        if (get_current_count() != INVENTORY_UNLIMITED) {
-                            inventory.items[inventory.selected].count --;
-                            if (get_current_count() == 0)
-                                inventory.items[inventory.selected].w = 0;
-                            db_set_slot(get_current_block(), inventory.selected, get_current_count());
+                            if (get_current_count() != INVENTORY_UNLIMITED) {
+                                inventory.items[inventory.selected].count --;
+                                if (get_current_count() == 0)
+                                    inventory.items[inventory.selected].w = 0;
+                                db_set_slot(get_current_block(), inventory.selected, get_current_count());
+                            }
                         }
                     }
                 }
@@ -2038,8 +2068,8 @@ int main(int argc, char **argv) {
         }
 
         if (inventory_toggle) {
+            inventory_screen = inventory_screen ? 0 : inventory_toggle;
             inventory_toggle = 0;
-            inventory_screen = !inventory_screen;
             exclusive = !inventory_screen;
             if (exclusive) {
                 glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
@@ -2220,12 +2250,24 @@ int main(int argc, char **argv) {
         }
         // RENDER INVENTORY //
 
-        render_inventory(&inventory_attrib, &block_attrib, &text_attrib, &item_attrib, (width - inv_width_offset) / 2, INVENTORY_ITEM_SIZE, INVENTORY_ITEM_SIZE * 1.5, inventory.selected);
+        int box_size = INVENTORY_ITEM_SIZE * 1.5;
+
+        render_inventory(&inventory_attrib, &block_attrib, &text_attrib, &item_attrib, (width - inv_width_offset) / 2, INVENTORY_ITEM_SIZE, box_size, inventory.selected);
 
         if (inventory_screen) {
-            render_inventory_screen(&inventory_attrib, &block_attrib, &text_attrib, &item_attrib, (width - inv_width_offset) / 2, (height / 2) - inv_height_offset, INVENTORY_ITEM_SIZE * 1.5, inventory.highlighted);
+            switch (inventory_screen) {
+            case 1:
+                render_craft_screen(&inventory_attrib, &block_attrib, &text_attrib, &item_attrib, (width / 2) + (box_size * 3), (height / 2) - inv_height_offset + (box_size * 5.5), box_size, inventory.highlighted - 36, 2);
+                break;
+            case 2:
+                render_craft_screen(&inventory_attrib, &block_attrib, &text_attrib, &item_attrib, (width / 2) + box_size, (height / 2) - inv_height_offset + (box_size * 6), box_size, inventory.highlighted - 36, 3);
+                break;
+            default:
+                break;
+            }
+            render_inventory_screen(&inventory_attrib, &block_attrib, &text_attrib, &item_attrib, (width - inv_width_offset) / 2, (height / 2) - inv_height_offset, box_size, inventory.highlighted);
             if (inventory.holding.count > 0) {
-                render_inventory_held(&block_attrib, &text_attrib, &item_attrib, px, py, INVENTORY_ITEM_SIZE * 1.5);
+                render_inventory_held(&block_attrib, &text_attrib, &item_attrib, px, py, box_size);
             }
         }
         player = players + observe1;

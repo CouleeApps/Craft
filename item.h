@@ -81,6 +81,8 @@ int is_placeable(int w);
 #define Flower5     get_item(22)
 #define Flower6     get_item(23)
 #define Flower7     get_item(24)
+#define Furnace     get_item(25)
+#define Workbench   get_item(26)
 /* ITEMS */
 #define Pickaxe     get_item(256)
 #define Shovel      get_item(257)
