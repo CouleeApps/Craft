@@ -25,12 +25,10 @@
 
 #define MAX_CHUNKS 1024
 #define MAX_PLAYERS 128
-#define CREATE_CHUNK_RADIUS 6
-#define RENDER_CHUNK_RADIUS 6
-#define DELETE_CHUNK_RADIUS 12
 #define MAX_RECV_LENGTH 1024
 #define MAX_TEXT_LENGTH 256
 #define MAX_NAME_LENGTH 32
+
 #define LEFT 0
 #define CENTER 1
 #define RIGHT 2
@@ -93,6 +91,9 @@ typedef struct {
     GLuint timer;
     GLuint extra1;
     GLuint extra2;
+    GLuint extra3;
+    GLuint extra4;
+    GLuint extra5;
 } Attrib;
 
 static GLFWwindow *window;
@@ -120,6 +121,28 @@ static InventoryScreen inventory_screen = 0;
 static int inventory_toggle = 0;
 static Entry breaking_block;
 static double breaking_start;
+
+int is_plant(int w) {
+    return w > 16;
+}
+
+int is_obstacle(int w) {
+    w = ABS(w);
+    return w > 0 && w < 16;
+}
+
+int is_transparent(int w) {
+    w = ABS(w);
+    return w == 0 || w == 10 || w == 15 || is_plant(w);
+}
+
+int is_destructable(int w) {
+    return w > 0 && w != 16;
+}
+
+int is_selectable(int w) {
+    return w > 0 && w <= 15;
+}
 
 int chunked(float x) {
     return floorf(roundf(x) / CHUNK_SIZE);
@@ -503,22 +526,37 @@ int chunk_distance(Chunk *chunk, int p, int q) {
 }
 
 int chunk_visible(Chunk *chunk, float *matrix) {
-    for (int dp = 0; dp <= 1; dp++) {
-        for (int dq = 0; dq <= 1; dq++) {
-            for (int y = 0; y < 128; y += 16) {
-                float vec[4] = {
-                    (chunk->p + dp) * CHUNK_SIZE - dp,
-                    y,
-                    (chunk->q + dq) * CHUNK_SIZE - dq,
-                    1};
-                mat_vec_multiply(vec, matrix, vec);
-                if (vec[3] >= 0) {
-                    return 1;
-                }
-            }
+    int x = chunk->p * CHUNK_SIZE - 1;
+    int z = chunk->q * CHUNK_SIZE - 1;
+    int d = CHUNK_SIZE + 1;
+    float points[4][2] = {
+        {x + 0, z + 0},
+        {x + d, z + 0},
+        {x + 0, z + d},
+        {x + d, z + d}
+    };
+    float x1, x2, y1, y2, z1, z2;
+    x1 = y1 = z1 = 2;
+    x2 = y2 = z2 = -2;
+    for (int y = 0; y <= 256; y += 32) {
+        for (int i = 0; i < 4; i++) {
+            float vec[4] = {points[i][0], y, points[i][1], 1};
+            mat_vec_multiply(vec, matrix, vec);
+            float nx = vec[0] / vec[3];
+            float ny = vec[1] / vec[3];
+            float nz = vec[2] / vec[3];
+            x1 = MIN(x1, nx); x2 = MAX(x2, nx);
+            y1 = MIN(y1, ny); y2 = MAX(y2, ny);
+            z1 = MIN(z1, nz); z2 = MAX(z2, nz);
         }
     }
-    return 0;
+    if (x2 < -1 || y2 < -1 || z2 < -1) {
+        return 0;
+    }
+    if (x1 > 1 || y1 > 1 || z1 > 1) {
+        return 0;
+    }
+    return 1;
 }
 
 int highest_block(float x, float z) {
@@ -875,6 +913,7 @@ int render_chunks(Attrib *attrib, Player *player) {
     ensure_chunks(s->x, s->y, s->z, 0);
     int p = chunked(s->x);
     int q = chunked(s->z);
+    float light = get_daylight();
     float matrix[16];
     set_matrix_3d(
         matrix, width, height, s->x, s->y, s->z, s->rx, s->ry, fov, ortho);
@@ -883,14 +922,18 @@ int render_chunks(Attrib *attrib, Player *player) {
     glUniform3f(attrib->camera, s->x, s->y, s->z);
     glUniform1i(attrib->sampler, BlockTexture.index);
     glUniform1i(attrib->extra1, SkyTexture.index);
-    glUniform1f(attrib->extra2, get_daylight());
+    glUniform1i(attrib->extra1, 2);
+    glUniform1f(attrib->extra2, light);
+    glUniform1i(attrib->extra3, SHOW_SKY_DOME);
+    glUniform1f(attrib->extra4, RENDER_CHUNK_RADIUS * CHUNK_SIZE);
+    glUniform3f(attrib->extra5, 0.59 * light, 0.74 * light, 0.85 * light);
     glUniform1f(attrib->timer, time_of_day());
     for (int i = 0; i < chunk_count; i++) {
         Chunk *chunk = chunks + i;
         if (chunk_distance(chunk, p, q) > RENDER_CHUNK_RADIUS) {
             continue;
         }
-        if (s->y < 100 && !chunk_visible(chunk, matrix)) {
+        if (!chunk_visible(chunk, matrix)) {
             continue;
         }
         draw_chunk(attrib, chunk);
@@ -1674,7 +1717,6 @@ int main(int argc, char **argv) {
     glEnable(GL_CULL_FACE);
     glEnable(GL_DEPTH_TEST);
     glLogicOp(GL_INVERT);
-    glClearColor(0.53, 0.81, 0.92, 1.00);
 
     GLuint texture;
     glGenTextures(1, &texture);
@@ -1736,6 +1778,9 @@ int main(int argc, char **argv) {
     block_attrib.sampler = glGetUniformLocation(program, "sampler");
     block_attrib.extra1 = glGetUniformLocation(program, "sky_sampler");
     block_attrib.extra2 = glGetUniformLocation(program, "daylight");
+    block_attrib.extra3 = glGetUniformLocation(program, "show_sky_dome");
+    block_attrib.extra4 = glGetUniformLocation(program, "fog_distance");
+    block_attrib.extra5 = glGetUniformLocation(program, "fog_color");
     block_attrib.camera = glGetUniformLocation(program, "camera");
     block_attrib.timer = glGetUniformLocation(program, "timer");
 
@@ -2140,7 +2185,8 @@ int main(int argc, char **argv) {
                 message_index = (message_index + 1) % MAX_MESSAGES;
             }
             char format[32];
-            snprintf(format, sizeof(format), "N,%%d,%%%ds", MAX_NAME_LENGTH - 1);
+            snprintf(
+                format, sizeof(format), "N,%%d,%%%ds", MAX_NAME_LENGTH - 1);
             char name[MAX_NAME_LENGTH];
             if (sscanf(buffer, format, &pid, name) == 2) {
                 Player *player = find_player(pid);
@@ -2162,6 +2208,7 @@ int main(int argc, char **argv) {
         }
 
         // PREPARE TO RENDER //
+        float light = get_daylight();
         observe1 = observe1 % player_count;
         observe2 = observe2 % player_count;
         delete_chunks();
@@ -2172,48 +2219,69 @@ int main(int argc, char **argv) {
         Player *player = players + observe1;
 
         // RENDER 3-D SCENE //
+        glClearColor(0.59 * light, 0.74 * light, 0.85 * light, 1.00);
         glClear(GL_COLOR_BUFFER_BIT);
         glClear(GL_DEPTH_BUFFER_BIT);
-        render_sky(&sky_attrib, player, sky_buffer);
-        glClear(GL_DEPTH_BUFFER_BIT);
+        if (SHOW_SKY_DOME) {
+            render_sky(&sky_attrib, player, sky_buffer);
+            glClear(GL_DEPTH_BUFFER_BIT);
+        }
         int face_count = render_chunks(&block_attrib, player);
         render_players(&block_attrib, player);
-        render_wireframe(&line_attrib, player);
+        if (SHOW_WIREFRAME) {
+            render_wireframe(&line_attrib, player);
+        }
 
         // RENDER HUD //
         glClear(GL_DEPTH_BUFFER_BIT);
-        render_crosshairs(&line_attrib);
+        if (SHOW_CROSSHAIRS) {
+            render_crosshairs(&line_attrib);
+        }
 
         // RENDER TEXT //
         char text_buffer[1024];
         float ts = 12 * scale;
         float tx = ts / 2;
         float ty = height - ts;
-        int hour = time_of_day() * 24;
-        char am_pm = hour < 12 ? 'a' : 'p';
-        hour = hour % 12;
-        hour = hour ? hour : 12;
-        snprintf(
-            text_buffer, 1024, "(%d, %d) (%.2f, %.2f, %.2f) [%d, %d, %d] %d%cm %dfps",
-            chunked(x), chunked(z), x, y, z,
-            player_count, chunk_count, face_count * 2, hour, am_pm, fps.fps);
-        render_text(&text_attrib, LEFT, tx, ty, ts, text_buffer);
-        for (int i = 0; i < MAX_MESSAGES; i++) {
-            int index = (message_index + i) % MAX_MESSAGES;
-            if (strlen(messages[index])) {
-                ty -= ts * 2;
-                render_text(&text_attrib, LEFT, tx, ty, ts, messages[index]);
+        if (SHOW_INFO_TEXT) {
+            int hour = time_of_day() * 24;
+            char am_pm = hour < 12 ? 'a' : 'p';
+            hour = hour % 12;
+            hour = hour ? hour : 12;
+            snprintf(
+                text_buffer, 1024,
+                "(%d, %d) (%.2f, %.2f, %.2f) [%d, %d, %d] %d%cm %dfps",
+                chunked(x), chunked(z), x, y, z,
+                player_count, chunk_count,
+                face_count * 2, hour, am_pm, fps.fps);
+            render_text(&text_attrib, LEFT, tx, ty, ts, text_buffer);
+            ty -= ts * 2;
+        }
+        if (SHOW_CHAT_TEXT) {
+            for (int i = 0; i < MAX_MESSAGES; i++) {
+                int index = (message_index + i) % MAX_MESSAGES;
+                if (strlen(messages[index])) {
+                    render_text(&text_attrib, LEFT, tx, ty, ts,
+                        messages[index]);
+                    ty -= ts * 2;
+                }
             }
         }
         if (typing) {
-            ty -= ts * 2;
             snprintf(text_buffer, 1024, "> %s", typing_buffer);
             render_text(&text_attrib, LEFT, tx, ty, ts, text_buffer);
+            ty -= ts * 2;
         }
-        Player *other = player_crosshair(player);
-        if (other) {
-            render_text(&text_attrib, CENTER,
-                width / 2, height / 2 - ts - 24, ts, other->name);
+        if (SHOW_PLAYER_NAMES) {
+            if (player != me) {
+                render_text(&text_attrib, CENTER, width / 2, ts, ts,
+                    player->name);
+            }
+            Player *other = player_crosshair(player);
+            if (other) {
+                render_text(&text_attrib, CENTER,
+                    width / 2, height / 2 - ts - 24, ts, other->name);
+            }
         }
 
         // RENDER PICTURE IN PICTURE //
@@ -2233,7 +2301,7 @@ int main(int argc, char **argv) {
             glClearColor(0, 0, 0, 1);
             glClear(GL_COLOR_BUFFER_BIT);
             glScissor(width - pw - offset, offset, pw, ph);
-            glClearColor(0.53, 0.81, 0.92, 1.00);
+            glClearColor(0.59 * light, 0.74 * light, 0.85 * light, 1.00);
             glClear(GL_COLOR_BUFFER_BIT);
             glDisable(GL_SCISSOR_TEST);
             glClear(GL_DEPTH_BUFFER_BIT);
@@ -2244,16 +2312,17 @@ int main(int argc, char **argv) {
             ortho = 0;
             fov = 65;
 
-            render_sky(&sky_attrib, player, sky_buffer);
-            glClear(GL_DEPTH_BUFFER_BIT);
+            if (SHOW_SKY_DOME) {
+                render_sky(&sky_attrib, player, sky_buffer);
+                glClear(GL_DEPTH_BUFFER_BIT);
+            }
             render_chunks(&block_attrib, player);
             render_players(&block_attrib, player);
-
             glClear(GL_DEPTH_BUFFER_BIT);
-            render_text(&text_attrib, CENTER, pw / 2, ts, ts, player->name);
-
-            width = ow, height = oh;
-            glViewport(0, 0, width, height);
+            if (SHOW_PLAYER_NAMES) {
+                render_text(&text_attrib, CENTER, pw / 2, ts, ts,
+                    player->name);
+            }
         }
         // RENDER INVENTORY //
 

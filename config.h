@@ -15,6 +15,18 @@
 #define USE_CACHE 1
 #define DAY_LENGTH 300
 
+// rendering options
+#define SHOW_SKY_DOME 1
+#define SHOW_PLANTS 1
+#define SHOW_CLOUDS 1
+#define SHOW_TREES 1
+#define SHOW_ITEM 1
+#define SHOW_CROSSHAIRS 1
+#define SHOW_WIREFRAME 1
+#define SHOW_INFO_TEXT 1
+#define SHOW_CHAT_TEXT 1
+#define SHOW_PLAYER_NAMES 1
+
 // key bindings
 #define CRAFT_KEY_QUIT GLFW_KEY_BACKSPACE
 #define CRAFT_KEY_FORWARD 'W'
@@ -42,6 +54,9 @@
 #define CRAFT_KEY_ZP 'N'
 
 // advanced parameters
+#define CREATE_CHUNK_RADIUS 6
+#define RENDER_CHUNK_RADIUS 6
+#define DELETE_CHUNK_RADIUS 12
 #define CHUNK_SIZE 32
 #define COMMIT_INTERVAL 5
 
