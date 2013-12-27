@@ -367,16 +367,6 @@ void draw_player(Attrib *attrib, Player *player) {
     draw_cube(attrib, player->buffer);
 }
 
-void print(
-    Attrib *attrib, int justify,
-    float x, float y, float n, char *text)
-{
-    int length = strlen(text);
-    x -= n * justify * (length - 1) / 2;
-    GLuint buffer = gen_text_buffer(x, y, n, text);
-    draw_text(attrib, buffer, length);
-    del_buffer(buffer);
-}
 
 Player *find_player(int id) {
     for (int i = 0; i < player_count; i++) {
@@ -1144,7 +1134,7 @@ void render_inventory_text(Attrib *attrib, Item item, float x, float y, float n,
     else
         snprintf(text_buffer, 16, "%d", item.count);
     x += ts * (2.5 - strlen(text_buffer));
-    print(attrib, LEFT,
+    render_text(attrib, LEFT,
         x, y, ts, text_buffer);
 }
 
@@ -1848,11 +1838,11 @@ int main(int argc, char **argv) {
         y = highest_block(x, z) + 2;
     }
 
-    scale = get_scale_factor();
-
     glfwGetCursorPos(window, &px, &py);
     double previous = glfwGetTime();
     while (!glfwWindowShouldClose(window)) {
+        scale = get_scale_factor();
+        
         glfwGetFramebufferSize(window, &width, &height);
         glViewport(0, 0, width, height);
 
