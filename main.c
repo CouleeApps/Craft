@@ -119,30 +119,8 @@ static char typing_buffer[MAX_TEXT_LENGTH] = {0};
 static Inventory inventory;
 static InventoryScreen inventory_screen = 0;
 static int inventory_toggle = 0;
-static Entry breaking_block;
+static MapEntry breaking_block;
 static double breaking_start;
-
-int is_plant(int w) {
-    return w > 16;
-}
-
-int is_obstacle(int w) {
-    w = ABS(w);
-    return w > 0 && w < 16;
-}
-
-int is_transparent(int w) {
-    w = ABS(w);
-    return w == 0 || w == 10 || w == 15 || is_plant(w);
-}
-
-int is_destructable(int w) {
-    return w > 0 && w != 16;
-}
-
-int is_selectable(int w) {
-    return w > 0 && w <= 15;
-}
 
 int chunked(float x) {
     return floorf(roundf(x) / CHUNK_SIZE);
@@ -862,7 +840,7 @@ void _set_block(int p, int q, int x, int y, int z, int w, int b) {
     Chunk *chunk = find_chunk(p, q);
     if (chunk) {
         Map *map = &chunk->map;
-        Entry current = map_get_entry(map, x, y, z);
+        MapEntry current = map_get_entry(map, x, y, z);
         if (current.b != b || current.w != w) {
             map_set(map, x, y, z, w, b);
             chunk->dirty = 1;
@@ -890,7 +868,7 @@ void set_block(int x, int y, int z, int w, int b) {
     client_block(x, y, z, w, inventory.selected);
 }
 
-Entry get_block_entry(int x, int y, int z) {
+MapEntry get_block_entry(int x, int y, int z) {
     int p = chunked(x);
     int q = chunked(z);
     Chunk *chunk = find_chunk(p, q);
@@ -898,7 +876,7 @@ Entry get_block_entry(int x, int y, int z) {
         Map *map = &chunk->map;
         return map_get_entry(map, x, y, z);
     }
-    Entry ret;
+    MapEntry ret;
     ret.x = 0;
     ret.y = 0;
     ret.z = 0;
@@ -2001,7 +1979,7 @@ int main(int argc, char **argv) {
                 int hw = hit_test(0, x, y, z, rx, ry,
                     &hx, &hy, &hz);
                 if (hy > 0 && hy < 256 && is_destructable(hw)) {
-                    Entry block = get_block_entry(hx, hy, hz);
+                    MapEntry block = get_block_entry(hx, hy, hz);
                     if (breaking_block.w != 0 && breaking_block.b <= 8 && !entry_compare(block, breaking_block)) {
                         breaking_block.b = 0;
                         set_block(breaking_block.x, breaking_block.y, breaking_block.z, breaking_block.w, 0);

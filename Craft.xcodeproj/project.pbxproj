@@ -15,6 +15,8 @@
 		B51C900C1867E0DD00432518 /* wglew.h in Headers */ = {isa = PBXBuildFile; fileRef = B51C8FF91867E0A800432518 /* wglew.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		B51C900F1867E15800432518 /* libglew.a in Frameworks */ = {isa = PBXBuildFile; fileRef = B51C90031867E0B500432518 /* libglew.a */; };
 		B51C90111867FB9700432518 /* crafting.c in Sources */ = {isa = PBXBuildFile; fileRef = B51C90101867FB9700432518 /* crafting.c */; };
+		B51E21AA186E1E1D00C1AEB0 /* ring.c in Sources */ = {isa = PBXBuildFile; fileRef = B51E21A8186E1E1D00C1AEB0 /* ring.c */; };
+		B51E21AB186E1E2F00C1AEB0 /* noise.c in Sources */ = {isa = PBXBuildFile; fileRef = B51E21A6186E1DCA00C1AEB0 /* noise.c */; };
 		B537CD57185EC69F00B652DD /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B537CD56185EC69F00B652DD /* CoreGraphics.framework */; };
 		B537CD59185EC6A300B652DD /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B537CD58185EC6A300B652DD /* AppKit.framework */; };
 		B537CD5B185EC6A700B652DD /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B537CD5A185EC6A700B652DD /* Foundation.framework */; };
@@ -24,7 +26,6 @@
 		B58A7643185EC09D00655BD9 /* db.c in Sources */ = {isa = PBXBuildFile; fileRef = B58A7594185EBF8100655BD9 /* db.c */; };
 		B58A7644185EC09D00655BD9 /* map.c in Sources */ = {isa = PBXBuildFile; fileRef = B58A7613185EBF8100655BD9 /* map.c */; };
 		B58A7645185EC09D00655BD9 /* matrix.c in Sources */ = {isa = PBXBuildFile; fileRef = B58A7615185EBF8100655BD9 /* matrix.c */; };
-		B58A7646185EC09D00655BD9 /* noise.c in Sources */ = {isa = PBXBuildFile; fileRef = B58A7617185EBF8100655BD9 /* noise.c */; };
 		B58A7647185EC09D00655BD9 /* util.c in Sources */ = {isa = PBXBuildFile; fileRef = B58A762A185EBF8100655BD9 /* util.c */; };
 		B58A7648185EC09D00655BD9 /* world.c in Sources */ = {isa = PBXBuildFile; fileRef = B58A762C185EBF8100655BD9 /* world.c */; };
 		B58A7649185EC12A00655BD9 /* main.c in Sources */ = {isa = PBXBuildFile; fileRef = B58A7612185EBF8100655BD9 /* main.c */; };
@@ -138,6 +139,10 @@
 		B51C90031867E0B500432518 /* libglew.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libglew.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		B51C90101867FB9700432518 /* crafting.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = crafting.c; sourceTree = "<group>"; };
 		B51C90121867FBA200432518 /* crafting.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = crafting.h; sourceTree = "<group>"; };
+		B51E21A6186E1DCA00C1AEB0 /* noise.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = noise.c; sourceTree = "<group>"; };
+		B51E21A7186E1DCA00C1AEB0 /* noise.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = noise.h; sourceTree = "<group>"; };
+		B51E21A8186E1E1D00C1AEB0 /* ring.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ring.c; sourceTree = "<group>"; };
+		B51E21A9186E1E1D00C1AEB0 /* ring.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ring.h; sourceTree = "<group>"; };
 		B537CD56185EC69F00B652DD /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
 		B537CD58185EC6A300B652DD /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
 		B537CD5A185EC6A700B652DD /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -256,8 +261,6 @@
 		B58A7614185EBF8100655BD9 /* map.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = map.h; sourceTree = "<group>"; };
 		B58A7615185EBF8100655BD9 /* matrix.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = matrix.c; sourceTree = "<group>"; };
 		B58A7616185EBF8100655BD9 /* matrix.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = matrix.h; sourceTree = "<group>"; };
-		B58A7617185EBF8100655BD9 /* noise.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = noise.c; sourceTree = "<group>"; };
-		B58A7618185EBF8100655BD9 /* noise.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = noise.h; sourceTree = "<group>"; };
 		B58A7619185EBF8100655BD9 /* server.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = server.py; sourceTree = "<group>"; };
 		B58A761B185EBF8100655BD9 /* block_fragment.glsl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = block_fragment.glsl; sourceTree = "<group>"; };
 		B58A761C185EBF8100655BD9 /* block_vertex.glsl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = block_vertex.glsl; sourceTree = "<group>"; };
@@ -385,6 +388,15 @@
 				B51C8FFE1867E0A800432518 /* visualinfo.c */,
 			);
 			path = src;
+			sourceTree = "<group>";
+		};
+		B51E21A5186E1DCA00C1AEB0 /* noise */ = {
+			isa = PBXGroup;
+			children = (
+				B51E21A6186E1DCA00C1AEB0 /* noise.c */,
+				B51E21A7186E1DCA00C1AEB0 /* noise.h */,
+			);
+			path = noise;
 			sourceTree = "<group>";
 		};
 		B58A7583185EBF5300655BD9 = {
@@ -644,8 +656,8 @@
 				B58A7614185EBF8100655BD9 /* map.h */,
 				B58A7615185EBF8100655BD9 /* matrix.c */,
 				B58A7616185EBF8100655BD9 /* matrix.h */,
-				B58A7617185EBF8100655BD9 /* noise.c */,
-				B58A7618185EBF8100655BD9 /* noise.h */,
+				B51E21A8186E1E1D00C1AEB0 /* ring.c */,
+				B51E21A9186E1E1D00C1AEB0 /* ring.h */,
 				B58A762A185EBF8100655BD9 /* util.c */,
 				B58A762B185EBF8100655BD9 /* util.h */,
 				B58A762C185EBF8100655BD9 /* world.c */,
@@ -668,6 +680,7 @@
 				B51C8FF41867E0A800432518 /* glew */,
 				B58A7597185EBF8100655BD9 /* glfw */,
 				B58A760F185EBF8100655BD9 /* lodepng */,
+				B51E21A5186E1DCA00C1AEB0 /* noise */,
 				B58A7621185EBF8100655BD9 /* sqlite */,
 				B58A7627185EBF8100655BD9 /* tinycthread */,
 			);
@@ -915,15 +928,16 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B51E21AB186E1E2F00C1AEB0 /* noise.c in Sources */,
 				B58A7649185EC12A00655BD9 /* main.c in Sources */,
 				B51C90111867FB9700432518 /* crafting.c in Sources */,
+				B51E21AA186E1E1D00C1AEB0 /* ring.c in Sources */,
 				B5DD996C1866B54300634CC0 /* item.c in Sources */,
 				B58A7641185EC09D00655BD9 /* client.c in Sources */,
 				B58A7642185EC09D00655BD9 /* cube.c in Sources */,
 				B58A7643185EC09D00655BD9 /* db.c in Sources */,
 				B58A7644185EC09D00655BD9 /* map.c in Sources */,
 				B58A7645185EC09D00655BD9 /* matrix.c in Sources */,
-				B58A7646185EC09D00655BD9 /* noise.c in Sources */,
 				B58A7647185EC09D00655BD9 /* util.c in Sources */,
 				B58A7648185EC09D00655BD9 /* world.c in Sources */,
 			);
@@ -1248,6 +1262,7 @@
 				B51C90061867E0B500432518 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		B58A7587185EBF5300655BD9 /* Build configuration list for PBXProject "Craft" */ = {
 			isa = XCConfigurationList;

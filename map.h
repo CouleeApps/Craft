@@ -31,7 +31,7 @@ void map_free(Map *map);
 void map_grow(Map *map);
 void map_set(Map *map, int x, int y, int z, int w, int b);
 int map_get(Map *map, int x, int y, int z);
-Entry map_get_entry(Map *map, int x, int y, int z);
-int entry_compare(Entry entry1, Entry entry2);
+MapEntry map_get_entry(Map *map, int x, int y, int z);
+int entry_compare(MapEntry entry1, MapEntry entry2);
 
 #endif
