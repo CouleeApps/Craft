@@ -1434,7 +1434,7 @@ void on_mouse_button(GLFWwindow *window, int button, int action, int mods) {
                 double mx, my;
                 glfwGetCursorPos(window, &mx, &my);
 
-                int sel = mouse_to_inventory(width - inv_width_offset, height, mx, my - inv_height_offset, INVENTORY_ITEM_SIZE * 1.5, (inventory_screen == PlayerInventory ? 2 : 3));
+                int sel = mouse_to_inventory((width / scale) - inv_width_offset, height / scale, mx, my - inv_height_offset, INVENTORY_ITEM_SIZE * 1.5, (inventory_screen == PlayerInventory ? 2 : 3));
                 Item *sel_item = get_inventory_item_ptr(sel);
 
                 if (sel_item == &inventory.crafted) {
@@ -1516,7 +1516,7 @@ void on_mouse_button(GLFWwindow *window, int button, int action, int mods) {
             double mx, my;
             glfwGetCursorPos(window, &mx, &my);
 
-            int sel = mouse_to_inventory(width - inv_width_offset, height, mx, my - inv_height_offset, INVENTORY_ITEM_SIZE * 1.5, (inventory_screen == PlayerInventory ? 2 : 3));
+            int sel = mouse_to_inventory((width / scale) - inv_width_offset, height / scale, mx, my - inv_height_offset, INVENTORY_ITEM_SIZE * 1.5, (inventory_screen == PlayerInventory ? 2 : 3));
             Item *sel_item = get_inventory_item_ptr(sel);
 
             if (sel_item->count != INVENTORY_UNLIMITED) {
@@ -1899,7 +1899,7 @@ int main(int argc, char **argv) {
         int sx = 0;
 
         if (inventory_screen) {
-            int sel = mouse_to_inventory(width - inv_width_offset, height, px, py - inv_height_offset, INVENTORY_ITEM_SIZE * 1.5, (inventory_screen == PlayerInventory ? 2 : 3));
+            int sel = mouse_to_inventory((width / scale) - inv_width_offset, height / scale, px, py - inv_height_offset, INVENTORY_ITEM_SIZE * 1.5, (inventory_screen == PlayerInventory ? 2 : 3));
             inventory.highlighted = sel;
         } else {
             if (!typing) {
@@ -2306,22 +2306,22 @@ int main(int argc, char **argv) {
 
         int box_size = INVENTORY_ITEM_SIZE * 1.5 * scale;
 
-        render_inventory(&inventory_attrib, &block_attrib, &text_attrib, &item_attrib, (width - inv_width_offset) / 2, INVENTORY_ITEM_SIZE * scale, box_size, inventory.selected, scale);
+        render_inventory(&inventory_attrib, &block_attrib, &text_attrib, &item_attrib, (width - (inv_width_offset * scale)) / 2, INVENTORY_ITEM_SIZE * scale, box_size, inventory.selected, scale);
 
         if (inventory_screen) {
             switch (inventory_screen) {
             case PlayerInventory:
-                render_craft_screen(&inventory_attrib, &block_attrib, &text_attrib, &item_attrib, (width / 2) + (box_size * 3), (height / 2) - inv_height_offset + (box_size * 5.5), box_size, inventory.highlighted - 36, 2, scale);
+                render_craft_screen(&inventory_attrib, &block_attrib, &text_attrib, &item_attrib, (width / 2) + (box_size * 3), (height / 2) - (inv_height_offset * scale) + (box_size * 5.5), box_size, inventory.highlighted - 36, 2, scale);
                 break;
             case WorkbenchInventory:
-                render_craft_screen(&inventory_attrib, &block_attrib, &text_attrib, &item_attrib, (width / 2) + box_size, (height / 2) - inv_height_offset + (box_size * 6), box_size, inventory.highlighted - 36, 3, scale);
+                render_craft_screen(&inventory_attrib, &block_attrib, &text_attrib, &item_attrib, (width / 2) + box_size, (height / 2) - (inv_height_offset * scale) + (box_size * 6), box_size, inventory.highlighted - 36, 3, scale);
                 break;
             default:
                 break;
             }
-            render_inventory_screen(&inventory_attrib, &block_attrib, &text_attrib, &item_attrib, (width - inv_width_offset) / 2, (height / 2) - inv_height_offset, box_size, inventory.highlighted);
+            render_inventory_screen(&inventory_attrib, &block_attrib, &text_attrib, &item_attrib, (width - (inv_width_offset * scale)) / 2, (height / 2) - (inv_height_offset * scale), box_size, inventory.highlighted);
             if (inventory.holding.count > 0) {
-                render_inventory_held(&block_attrib, &text_attrib, &item_attrib, px, py, box_size, scale);
+                render_inventory_held(&block_attrib, &text_attrib, &item_attrib, px * scale, py * scale, box_size, scale);
             }
         }
         player = players + observe1;
