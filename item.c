@@ -72,9 +72,8 @@ void init_items() {
 }
 
 ItemType get_item(int id) {
-    ItemType blank;
-    if (id > item_count)
-        return blank;
+    if (id > item_count || id < 0)
+        return (ItemType){0};
     return item_types[id];
 }
 
