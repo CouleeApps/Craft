@@ -20,7 +20,6 @@
 		B537CD57185EC69F00B652DD /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B537CD56185EC69F00B652DD /* CoreGraphics.framework */; };
 		B537CD59185EC6A300B652DD /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B537CD58185EC6A300B652DD /* AppKit.framework */; };
 		B537CD5B185EC6A700B652DD /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B537CD5A185EC6A700B652DD /* Foundation.framework */; };
-		B58A763D185EC09000655BD9 /* Craft.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = B58A763C185EC09000655BD9 /* Craft.1 */; };
 		B58A7641185EC09D00655BD9 /* client.c in Sources */ = {isa = PBXBuildFile; fileRef = B58A758F185EBF8100655BD9 /* client.c */; };
 		B58A7642185EC09D00655BD9 /* cube.c in Sources */ = {isa = PBXBuildFile; fileRef = B58A7592185EBF8100655BD9 /* cube.c */; };
 		B58A7643185EC09D00655BD9 /* db.c in Sources */ = {isa = PBXBuildFile; fileRef = B58A7594185EBF8100655BD9 /* db.c */; };
@@ -122,7 +121,6 @@
 			dstPath = /usr/share/man/man1/;
 			dstSubfolderSpec = 0;
 			files = (
-				B58A763D185EC09000655BD9 /* Craft.1 in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 1;
 		};
@@ -280,8 +278,6 @@
 		B58A762C185EBF8100655BD9 /* world.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = world.c; sourceTree = "<group>"; };
 		B58A762D185EBF8100655BD9 /* world.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = world.h; sourceTree = "<group>"; };
 		B58A7637185EC09000655BD9 /* Craft */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = Craft; sourceTree = BUILT_PRODUCTS_DIR; };
-		B58A763A185EC09000655BD9 /* main.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = main.c; sourceTree = "<group>"; };
-		B58A763C185EC09000655BD9 /* Craft.1 */ = {isa = PBXFileReference; lastKnownFileType = text.man; path = Craft.1; sourceTree = "<group>"; };
 		B58A764F185EC14600655BD9 /* libtinycthread.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libtinycthread.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		B58A765C185EC16700655BD9 /* libsqlite.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libsqlite.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		B58A766B185EC18D00655BD9 /* liblodepng.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = liblodepng.a; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -405,7 +401,6 @@
 				B58A762F185EBF8C00655BD9 /* Server */,
 				B58A7630185EBF9B00655BD9 /* Client */,
 				B58A7631185EC04000655BD9 /* Dependencies */,
-				B58A7639185EC09000655BD9 /* Craft */,
 				B58A7638185EC09000655BD9 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -710,15 +705,6 @@
 				B51C90031867E0B500432518 /* libglew.a */,
 			);
 			name = Products;
-			sourceTree = "<group>";
-		};
-		B58A7639185EC09000655BD9 /* Craft */ = {
-			isa = PBXGroup;
-			children = (
-				B58A763A185EC09000655BD9 /* main.c */,
-				B58A763C185EC09000655BD9 /* Craft.1 */,
-			);
-			path = Craft;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
