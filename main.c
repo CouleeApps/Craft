@@ -809,8 +809,8 @@ void gen_chunk_buffer(Chunk *chunk) {
                 f1, f2, f3, f4, f5, f6,
                 e->x, e->y, e->z, 0.5, e->w);
 
-            if (0) {//e->b > 0) {
-                offset += total * 48;
+            if (e->b > 0) {
+                offset += total * 54;
                 make_break(
                     data + offset, ao,
                     f1, f2, f3, f4, f5, f6,
