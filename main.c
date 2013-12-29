@@ -1114,108 +1114,6 @@ void render_inventory_item(Attrib *attrib, Item item, float x, float y, float si
     del_buffer(buffer);
 }
 
-#if SHOW_CRAFT_SCREEN == 1
-
-void render_crafting_grid(Attrib *attrib, float x, float y, float n, int sel, int grid_size) {
-    float matrix[16];
-    set_matrix_2d(matrix, width, height);
-    glClear(GL_DEPTH_BUFFER_BIT);
-    glUseProgram(attrib->program);
-    glUniformMatrix4fv(attrib->matrix, 1, GL_FALSE, matrix);
-    glUniform1i(attrib->sampler, InventoryTexture.index);
-
-    GLuint buffer = gen_crafting_buffers(x, y, n, sel, grid_size);
-
-    draw_inventory(attrib, buffer, 10);
-    del_buffer(buffer);
-}
-
-void render_crafting_items(Attrib *block_attrib, Attrib *item_attrib, float x, float y, float size, int grid_size) {
-    for (int row = 0; row < grid_size; row ++) {
-        for (int col = 0; col < grid_size; col ++) {
-            Item block = inventory.crafting[col + (row * 3)];
-
-            if (block.w == 0)
-                continue;
-
-            if (block.count == 0)
-                continue;
-
-            /* 1  ...  0  ... -1 */
-            /* 0 1 2 3 4 5 6 7 8 */
-            /* 1 ...  0  ...-1 */
-            /* 0 1 2 3 4 5 6 7 */
-            float slotoff = (col - grid_size) * 1.5;
-            float xpos = x + slotoff * size;
-            float ypos = y - (size * (is_item(block.w) ? 0.5 : 0)) + (((row - (grid_size - 1.) / 2.) * 1.5)) * size;
-
-            if (is_item(block.w))
-                render_inventory_item(item_attrib, block, xpos, ypos, size);
-            else
-                render_inventory_item(block_attrib, block, xpos, ypos, size * 0.75);
-        }
-    }
-    Item block = inventory.crafted;
-    if (block.w != 0) {
-        float xpos = x + (1 * size) * 1.5;
-        float ypos = y - (size * (is_item(block.w) ? 0.5 : 0));
-
-        if (is_item(block.w))
-            render_inventory_item(item_attrib, block, xpos, ypos, size);
-        else
-            render_inventory_item(block_attrib, block, xpos, ypos, size * 0.75);
-    }
-}
-
-void render_crafting_texts(Attrib *attrib, float x, float y, float n, int grid_size, int scale) {
-    for (int row = 0; row < grid_size; row ++) {
-        for (int col = 0; col < grid_size; col ++) {
-            Item block = inventory.crafting[col + (row * 3)];
-
-            if (block.w == 0)
-                continue;
-
-            if (block.count <= 1)
-                continue;
-
-            /* 1  ...  0  ... -1 */
-            /* 0 1 2 3 4 5 6 7 8 */
-            /* 1 ...  0  ...-1 */
-            /* 0 1 2 3 4 5 6 7 */
-            float sep = INVENTORY_ITEM_SIZE * 1.5 * scale;
-            float tx = x + (sep * (col - grid_size));
-            float ty = y + (sep * (row - (grid_size - 1.) / 2.)) - sep / grid_size;
-            render_inventory_text(attrib, block, tx, ty, n, scale);
-        }
-    }
-    Item block = inventory.crafted;
-    if (block.w != 0 && block.count > 1) {
-        float sep = INVENTORY_ITEM_SIZE * 1.5 * scale;
-        float tx = x + sep;
-        float ty = y == 0 ? sep / grid_size : y - sep / grid_size;
-        render_inventory_text(attrib, block, tx, ty, n, scale);
-    }
-}
-
-void render_craft_screen(Attrib *window_attrib, Attrib *block_attrib, Attrib *text_attrib, Attrib *item_attrib,
-                         float x, float y, float n, int sel, int size, int scale) {
-#if SHOW_INVENTORY_BG == 1
-    render_crafting_grid(window_attrib, x, y, n, sel, size);
-    glClear(GL_DEPTH_BUFFER_BIT);
-#endif
-
-#if SHOW_INVENTORY_ITEMS == 1
-    render_crafting_items(block_attrib, item_attrib, x, y, n / 1.5, size);
-    glClear(GL_DEPTH_BUFFER_BIT);
-#endif
-
-#if SHOW_INVENTORY_COUNTS == 1
-    render_crafting_texts(text_attrib, x, y, n / 1.5, size, scale);
-#endif
-}
-
-#endif
-
 void render_inventory_items(Attrib *block_attrib, Attrib *item_attrib, float x, float y, float size, int row) {
     for (int item = 0; item < INVENTORY_SLOTS; item ++) {
         Item block = inventory.items[item + (row * INVENTORY_SLOTS)];
@@ -1324,6 +1222,108 @@ void render_inventory_held(Attrib *block_attrib, Attrib *text_attrib, Attrib *it
     }
 #endif
 }
+
+#if SHOW_CRAFT_SCREEN == 1
+
+void render_crafting_grid(Attrib *attrib, float x, float y, float n, int sel, int grid_size) {
+    float matrix[16];
+    set_matrix_2d(matrix, width, height);
+    glClear(GL_DEPTH_BUFFER_BIT);
+    glUseProgram(attrib->program);
+    glUniformMatrix4fv(attrib->matrix, 1, GL_FALSE, matrix);
+    glUniform1i(attrib->sampler, InventoryTexture.index);
+
+    GLuint buffer = gen_crafting_buffers(x, y, n, sel, grid_size);
+
+    draw_inventory(attrib, buffer, 10);
+    del_buffer(buffer);
+}
+
+void render_crafting_items(Attrib *block_attrib, Attrib *item_attrib, float x, float y, float size, int grid_size) {
+    for (int row = 0; row < grid_size; row ++) {
+        for (int col = 0; col < grid_size; col ++) {
+            Item block = inventory.crafting[col + (row * 3)];
+
+            if (block.w == 0)
+                continue;
+
+            if (block.count == 0)
+                continue;
+
+            /* 1  ...  0  ... -1 */
+            /* 0 1 2 3 4 5 6 7 8 */
+            /* 1 ...  0  ...-1 */
+            /* 0 1 2 3 4 5 6 7 */
+            float slotoff = (col - grid_size) * 1.5;
+            float xpos = x + slotoff * size;
+            float ypos = y - (size * (is_item(block.w) ? 0.5 : 0)) + (((row - (grid_size - 1.) / 2.) * 1.5)) * size;
+
+            if (is_item(block.w))
+                render_inventory_item(item_attrib, block, xpos, ypos, size);
+            else
+                render_inventory_item(block_attrib, block, xpos, ypos, size * 0.75);
+        }
+    }
+    Item block = inventory.crafted;
+    if (block.w != 0) {
+        float xpos = x + (1 * size) * 1.5;
+        float ypos = y - (size * (is_item(block.w) ? 0.5 : 0));
+
+        if (is_item(block.w))
+            render_inventory_item(item_attrib, block, xpos, ypos, size);
+        else
+            render_inventory_item(block_attrib, block, xpos, ypos, size * 0.75);
+    }
+}
+
+void render_crafting_texts(Attrib *attrib, float x, float y, float n, int grid_size, int scale) {
+    for (int row = 0; row < grid_size; row ++) {
+        for (int col = 0; col < grid_size; col ++) {
+            Item block = inventory.crafting[col + (row * 3)];
+
+            if (block.w == 0)
+                continue;
+
+            if (block.count <= 1)
+                continue;
+
+            /* 1  ...  0  ... -1 */
+            /* 0 1 2 3 4 5 6 7 8 */
+            /* 1 ...  0  ...-1 */
+            /* 0 1 2 3 4 5 6 7 */
+            float sep = INVENTORY_ITEM_SIZE * 1.5 * scale;
+            float tx = x + (sep * (col - grid_size));
+            float ty = y + (sep * (row - (grid_size - 1.) / 2.)) - sep / grid_size;
+            render_inventory_text(attrib, block, tx, ty, n, scale);
+        }
+    }
+    Item block = inventory.crafted;
+    if (block.w != 0 && block.count > 1) {
+        float sep = INVENTORY_ITEM_SIZE * 1.5 * scale;
+        float tx = x + sep;
+        float ty = y == 0 ? sep / grid_size : y - sep / grid_size;
+        render_inventory_text(attrib, block, tx, ty, n, scale);
+    }
+}
+
+void render_craft_screen(Attrib *window_attrib, Attrib *block_attrib, Attrib *text_attrib, Attrib *item_attrib,
+                         float x, float y, float n, int sel, int size, int scale) {
+#if SHOW_INVENTORY_BG == 1
+    render_crafting_grid(window_attrib, x, y, n, sel, size);
+    glClear(GL_DEPTH_BUFFER_BIT);
+#endif
+
+#if SHOW_INVENTORY_ITEMS == 1
+    render_crafting_items(block_attrib, item_attrib, x, y, n / 1.5, size);
+    glClear(GL_DEPTH_BUFFER_BIT);
+#endif
+
+#if SHOW_INVENTORY_COUNTS == 1
+    render_crafting_texts(text_attrib, x, y, n / 1.5, size, scale);
+#endif
+}
+
+#endif
 
 float *mouse_to_grid(int screen_width, int screen_height, float x, float y, float n) {
     /* .. 0 .. 1 .. 2 .. 3 .. 4 .. 5 .. 6 .. 7 .. 8 .. */

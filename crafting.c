@@ -264,7 +264,6 @@ Item get_crafting_result(Item *raw_input) {
     }
     //Left
     int shift_left = 0, shift_right = 0;
-    int *shift_dir = &shift_left;
     for (int x = 0; x < 3; x ++) {
         int shift = 1;
 
@@ -277,9 +276,7 @@ Item get_crafting_result(Item *raw_input) {
             }
         }
         if (shift)
-            (*shift_dir) ++;
-        else
-            shift_dir = &shift_right;
+            shift_left ++;
     }
 
     Item *input = calloc(9, sizeof(Item));
@@ -332,6 +329,7 @@ Item get_crafting_result(Item *raw_input) {
         }
     }
 
+    return(Item){0};
     for (int y = 0; y < 3; y ++) {
         int pos1 = (y * 3);
         int pos2 = (y * 3) + 2 - (shift_right + shift_left);
