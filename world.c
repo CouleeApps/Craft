@@ -7,6 +7,10 @@ void create_world(Map *map, int p, int q) {
     int pad = 1;
     for (int dx = -pad; dx < CHUNK_SIZE + pad; dx++) {
         for (int dz = -pad; dz < CHUNK_SIZE + pad; dz++) {
+            int flag = 1;
+            if (dx < 0 || dz < 0 || dx >= CHUNK_SIZE || dz >= CHUNK_SIZE) {
+                flag = -1;
+            }
             int x = p * CHUNK_SIZE + dx;
             int z = q * CHUNK_SIZE + dz;
             float f = simplex2(x * 0.01, z * 0.01, 4, 0.5, 2);
@@ -20,33 +24,29 @@ void create_world(Map *map, int p, int q) {
                 h = t;
                 w = Sand.id;
             }
-            if (dx < 0 || dz < 0 || dx >= CHUNK_SIZE || dz >= CHUNK_SIZE) {
-                w = -1;
-            }
             // sand and grass terrain
             for (int y = 0; y < h; y++) {
                 if (y > h - l) {
                     if (w == Grass.id && y != h - 1)
-                        map_set(map, x, y, z, Dirt.id, 0);
+                        map_set(map, x, y, z, Dirt.id * flag, 0);
                     else {
                         map_set(map, x, y, z, w, 0);
                         if (w == Grass.id && map_get(map, x, y - 1, z) == Grass.id)
-                            map_set(map, x, y - 1, z, Dirt.id, 0);
+                            map_set(map, x, y - 1, z, Dirt.id * flag, 0);
                     }
                 } else
-                    map_set(map, x, y, z, Stone.id, 0);
+                    map_set(map, x, y, z, Stone.id * flag, 0);
             }
-            // TODO: w = -1 if outside of chunk
             if (w == Grass.id) {
                 if (SHOW_PLANTS) {
                     // grass
                     if (simplex2(-x * 0.1, z * 0.1, 4, 0.8, 2) > 0.6) {
-                        map_set(map, x, h, z, TallGrass.id, 0);
+                        map_set(map, x, h, z, TallGrass.id * flag, 0);
                     }
                 	// flowers
                		if (simplex2(x * 0.05, -z * 0.05, 4, 0.8, 2) > 0.7) {
             	        int w = Flower1.id + simplex2(x * 0.1, z * 0.1, 4, 0.8, 2) * 7;
-            	        map_set(map, x, h, z, w, 0);
+            	        map_set(map, x, h, z, w * flag, 0);
             	    }
 				}
                 // trees
@@ -77,7 +77,7 @@ void create_world(Map *map, int p, int q) {
             if (SHOW_CLOUDS) {
 	            for (int y = 64; y < 72; y++) {
     	            if (simplex3(x * 0.01, y * 0.1, z * 0.01, 8, 0.5, 2) > 0.75) {
-        	            map_set(map, x, y, z, Cloud.id, 0);
+        	            map_set(map, x, y, z, Cloud.id * flag, 0);
             	    }
             	}
 			}
