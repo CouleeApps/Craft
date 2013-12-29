@@ -1977,8 +1977,10 @@ int main(int argc, char **argv) {
         int sx = 0;
 
         if (inventory_screen) {
+#if SHOW_INVENTORY_SELECTION == 1
             int sel = mouse_to_inventory((width / scale) - inv_width_offset, height / scale, px, py - inv_height_offset, INVENTORY_ITEM_SIZE * 1.5, (inventory_screen == PlayerInventory ? 2 : 3));
             inventory.highlighted = sel;
+#endif
         } else {
             if (!typing) {
                 float m = dt * 1.0;
@@ -2370,6 +2372,8 @@ int main(int argc, char **argv) {
                 render_text(&text_attrib, CENTER, pw / 2, ts, ts,
                     player->name);
             }
+            
+            width = ow, height = oh;
         }
         // RENDER INVENTORY //
 
