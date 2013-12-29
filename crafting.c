@@ -230,7 +230,7 @@ void init_crafting() {
     recipe_count ++;
 }
 
-Item get_crafting_result(Item *raw_input) {
+Item get_crafting_result(Item *input) {
     /* Input comes in this format:
      678
      345
@@ -252,7 +252,7 @@ Item get_crafting_result(Item *raw_input) {
         //If the row is empty
         for (int x = 0; x < 3; x ++) {
             int pos = x + (y * 3);
-            if (raw_input[pos].w != 0) {
+            if (input[pos].w != 0) {
                 shift = 0;
                 break;
             }
@@ -263,37 +263,38 @@ Item get_crafting_result(Item *raw_input) {
             break;
     }
     //Left
-    int shift_left = 0, shift_right = 0;
-    for (int x = 0; x < 3; x ++) {
+    int shift_left = 0;
+    for (int x = 0; x < 2; x ++) {
         int shift = 1;
 
         //If the col is empty
         for (int y = 0; y < 3; y ++) {
             int pos = x + (y * 3);
-            if (raw_input[pos].w != 0) {
+            if (input[pos].w != 0) {
                 shift = 0;
                 break;
             }
         }
         if (shift)
             shift_left ++;
+        else break;
     }
+    //Right
+    int shift_right = 0;
+    for (int x = 2; x > 0; x --) {
+        int shift = 1;
 
-    Item *input = calloc(9, sizeof(Item));
-    for (int i = 0; i < 9; i ++) {
-        input[i].w = 0;
-        input[i].count = 0;
-    }
-
-    for (int x = 0; x < 3; x ++) {
+        //If the col is empty
         for (int y = 0; y < 3; y ++) {
-            int pos_old = x + (y * 3);
-            int pos_new = (x - shift_left) + (y + shift_up) * 3;
-            if (pos_new >= 0 && pos_new < 9) {
-                input[pos_new].w = raw_input[pos_old].w;
-                input[pos_new].count = raw_input[pos_old].count;
+            int pos = x + (y * 3);
+            if (input[pos].w != 0) {
+                shift = 0;
+                break;
             }
         }
+        if (shift)
+            shift_right ++;
+        else break;
     }
 
     for (int rec = 0; rec < recipe_count; rec ++) {
@@ -313,7 +314,16 @@ Item get_crafting_result(Item *raw_input) {
             else
                 printf("INVALID RECIPE INDEX: %c\n", ch);
 
-            int input_w = input[(i % 3) + (3*(2-(i / 3)))].w;
+            int x = i % 3;
+            int y = (i - x) / 3;
+
+            x += shift_left;
+            y += shift_up;
+
+            int input_w = 0;
+
+            if (x < 3 && y < 3)
+                input_w = input[x + ((2 - y) * 3)].w;
 
             if (req_w != input_w) { //Nope
                 correct = 0;
@@ -327,28 +337,9 @@ Item get_crafting_result(Item *raw_input) {
             ret.count = recipe.output_count;
             return ret;
         }
-    }
 
-    return(Item){0};
-    for (int y = 0; y < 3; y ++) {
-        int pos1 = (y * 3);
-        int pos2 = (y * 3) + 2 - (shift_right + shift_left);
-        //Swap them
-        Item store;
-        store.w = input[pos1].w;
-        store.count = input[pos1].count;
-        input[pos1].w = input[pos2].w;
-        input[pos1].count = input[pos2].count;
-        input[pos2].w = store.w;
-        input[pos2].count = store.count;
-    }
-
-    //Attempt again reversed
-    for (int rec = 0; rec < recipe_count; rec ++) {
-        Recipe recipe = recipes[rec];
-        int len = strlen(recipe.input_pattern);
-
-        int correct = 1;
+        //Check again, but inversed
+        correct = 1;
         for (int i = 0; i < len; i ++) {
             char ch;
             strncpy(&ch, recipe.input_pattern + i, sizeof(char));
@@ -361,7 +352,16 @@ Item get_crafting_result(Item *raw_input) {
             else
                 printf("INVALID RECIPE INDEX: %c\n", ch);
 
-            int input_w = input[(i % 3) + (3*(2-(i / 3)))].w;
+            int x = i % 3;
+            int y = (i - x) / 3;
+
+            x += shift_right;
+            y += shift_up;
+
+            int input_w = 0;
+
+            if (x < 3 && y < 3)
+                input_w = input[(2 - x) + ((2 - y) * 3)].w;
 
             if (req_w != input_w) { //Nope
                 correct = 0;
@@ -376,6 +376,5 @@ Item get_crafting_result(Item *raw_input) {
             return ret;
         }
     }
-
     return (Item){0};
 }
