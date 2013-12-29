@@ -1257,53 +1257,71 @@ void render_inventory_texts(Attrib *attrib, float x, float y, float n, int row, 
 
 void render_inventory(Attrib *window_attrib, Attrib *block_attrib, Attrib *text_attrib, Attrib *item_attrib,
                           float x, float y, float n, int sel, int scale) {
-    render_inventory_bar(window_attrib, x, y, n, sel);
-    glClear(GL_DEPTH_BUFFER_BIT);
-    render_inventory_items(block_attrib, item_attrib, x, y, n / 1.5, 0);
-    glClear(GL_DEPTH_BUFFER_BIT);
-    render_inventory_texts(text_attrib, x, y, n, 0, scale);
+    if (SHOW_INVENTORY_BG) {
+        render_inventory_bar(window_attrib, x, y, n, sel);
+        glClear(GL_DEPTH_BUFFER_BIT);
+    }
+    if (SHOW_INVENTORY_ITEMS) {
+        render_inventory_items(block_attrib, item_attrib, x, y, n / 1.5, 0);
+        glClear(GL_DEPTH_BUFFER_BIT);
+    }
+    if (SHOW_INVENTORY_COUNTS) {
+        render_inventory_texts(text_attrib, x, y, n, 0, scale);
+    }
 }
 
 void render_inventory_screen(Attrib *window_attrib, Attrib *block_attrib, Attrib *text_attrib, Attrib *item_attrib,
                       float x, float y, float n, int sel) {
-    for (int row = 0; row < INVENTORY_ROWS; row ++)
-        render_inventory_bar(window_attrib, x, y + n*row, n, sel - (row * INVENTORY_SLOTS));
+    if (SHOW_INVENTORY_BG) {
+        for (int row = 0; row < INVENTORY_ROWS; row ++)
+            render_inventory_bar(window_attrib, x, y + n*row, n, sel - (row * INVENTORY_SLOTS));
+        glClear(GL_DEPTH_BUFFER_BIT);
+    }
 
-    glClear(GL_DEPTH_BUFFER_BIT);
+    if (SHOW_INVENTORY_ITEMS) {
+        for (int row = 0; row < INVENTORY_ROWS; row ++)
+            render_inventory_items(block_attrib, item_attrib, x, y + n*row, n / 1.5, row);
+        glClear(GL_DEPTH_BUFFER_BIT);
+    }
 
-    for (int row = 0; row < INVENTORY_ROWS; row ++)
-        render_inventory_items(block_attrib, item_attrib, x, y + n*row, n / 1.5, row);
-
-    glClear(GL_DEPTH_BUFFER_BIT);
-
-    for (int row = 0; row < INVENTORY_ROWS; row ++)
-        render_inventory_texts(text_attrib, x, y + n*row, n, row, scale);
+    if (SHOW_INVENTORY_COUNTS) {
+        for (int row = 0; row < INVENTORY_ROWS; row ++)
+            render_inventory_texts(text_attrib, x, y + n*row, n, row, scale);
+    }
 }
 
 void render_craft_screen(Attrib *window_attrib, Attrib *block_attrib, Attrib *text_attrib, Attrib *item_attrib,
                          float x, float y, float n, int sel, int size, int scale) {
-    render_crafting_grid(window_attrib, x, y, n, sel, size);
+    if (SHOW_INVENTORY_BG) {
+        render_crafting_grid(window_attrib, x, y, n, sel, size);
+        glClear(GL_DEPTH_BUFFER_BIT);
+    }
 
-    glClear(GL_DEPTH_BUFFER_BIT);
+    if (SHOW_INVENTORY_ITEMS) {
+        render_crafting_items(block_attrib, item_attrib, x, y, n / 1.5, size);
+        glClear(GL_DEPTH_BUFFER_BIT);
+    }
 
-    render_crafting_items(block_attrib, item_attrib, x, y, n / 1.5, size);
-
-    glClear(GL_DEPTH_BUFFER_BIT);
-
-    render_crafting_texts(text_attrib, x, y, n / 1.5, size, scale);
+    if (SHOW_INVENTORY_COUNTS) {
+        render_crafting_texts(text_attrib, x, y, n / 1.5, size, scale);
+    }
 }
 
 void render_inventory_held(Attrib *block_attrib, Attrib *text_attrib, Attrib *item_attrib,
-                           float x, float y, float n, scale) {
-    if (is_item(inventory.holding.w))
-        render_inventory_item(item_attrib, inventory.holding, x, (height - y) - (n / 1.5) * 0.5, n / 1.5);
-    else
-        render_inventory_item(block_attrib, inventory.holding, x, height - y, (n / 1.5) * 0.75);
-    glClear(GL_DEPTH_BUFFER_BIT);
+                           float x, float y, float n, int scale) {
+    if (SHOW_INVENTORY_ITEMS) {
+        if (is_item(inventory.holding.w))
+            render_inventory_item(item_attrib, inventory.holding, x, (height - y) - (n / 1.5) * 0.5, n / 1.5);
+        else
+            render_inventory_item(block_attrib, inventory.holding, x, height - y, (n / 1.5) * 0.75);
+        glClear(GL_DEPTH_BUFFER_BIT);
+    }
 
-    if (inventory.holding.count > 1) {
-        float sep = INVENTORY_ITEM_SIZE * 1.5;
-        render_inventory_text(text_attrib, inventory.holding, x, (height - y) - sep / 3, n, scale);
+    if (SHOW_INVENTORY_COUNTS) {
+        if (inventory.holding.count > 1) {
+            float sep = INVENTORY_ITEM_SIZE * 1.5;
+            render_inventory_text(text_attrib, inventory.holding, x, (height - y) - sep / 3, n, scale);
+        }
     }
 }
 
@@ -2357,20 +2375,24 @@ int main(int argc, char **argv) {
 
         int box_size = INVENTORY_ITEM_SIZE * 1.5 * scale;
 
-        render_inventory(&inventory_attrib, &block_attrib, &text_attrib, &item_attrib, (width - (inv_width_offset * scale)) / 2, INVENTORY_ITEM_SIZE * scale, box_size, inventory.selected, scale);
+        if (SHOW_INVENTORY_BAR)
+            render_inventory(&inventory_attrib, &block_attrib, &text_attrib, &item_attrib, (width - (inv_width_offset * scale)) / 2, INVENTORY_ITEM_SIZE * scale, box_size, inventory.selected, scale);
 
         if (inventory_screen) {
-            switch (inventory_screen) {
-            case PlayerInventory:
-                render_craft_screen(&inventory_attrib, &block_attrib, &text_attrib, &item_attrib, (width / 2) + (box_size * 3), (height / 2) - (inv_height_offset * scale) + (box_size * 5.5), box_size, inventory.highlighted - 36, 2, scale);
-                break;
-            case WorkbenchInventory:
-                render_craft_screen(&inventory_attrib, &block_attrib, &text_attrib, &item_attrib, (width / 2) + box_size, (height / 2) - (inv_height_offset * scale) + (box_size * 6), box_size, inventory.highlighted - 36, 3, scale);
-                break;
-            default:
-                break;
+            if (SHOW_CRAFT_SCREEN) {
+                switch (inventory_screen) {
+                case PlayerInventory:
+                    render_craft_screen(&inventory_attrib, &block_attrib, &text_attrib, &item_attrib, (width / 2) + (box_size * 3), (height / 2) - (inv_height_offset * scale) + (box_size * 5.5), box_size, inventory.highlighted - 36, 2, scale);
+                    break;
+                case WorkbenchInventory:
+                    render_craft_screen(&inventory_attrib, &block_attrib, &text_attrib, &item_attrib, (width / 2) + box_size, (height / 2) - (inv_height_offset * scale) + (box_size * 6), box_size, inventory.highlighted - 36, 3, scale);
+                    break;
+                default:
+                    break;
+                }
             }
-            render_inventory_screen(&inventory_attrib, &block_attrib, &text_attrib, &item_attrib, (width - (inv_width_offset * scale)) / 2, (height / 2) - (inv_height_offset * scale), box_size, inventory.highlighted);
+            if (SHOW_INVENTORY_WINDOW)
+                render_inventory_screen(&inventory_attrib, &block_attrib, &text_attrib, &item_attrib, (width - (inv_width_offset * scale)) / 2, (height / 2) - (inv_height_offset * scale), box_size, inventory.highlighted);
             if (inventory.holding.count > 0) {
                 render_inventory_held(&block_attrib, &text_attrib, &item_attrib, px * scale, py * scale, box_size, scale);
             }

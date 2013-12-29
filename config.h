@@ -68,6 +68,15 @@
 #define INVENTORY_FONT_SIZE 20
 #define INVENTORY_UNLIMITED 0x7fffffff
 
+// creative
 #define CREATIVE_MODE 0
+
+// hide inventory things
+#define SHOW_CRAFT_SCREEN 1
+#define SHOW_INVENTORY_COUNTS 1
+#define SHOW_INVENTORY_ITEMS 1
+#define SHOW_INVENTORY_BG 1
+#define SHOW_INVENTORY_WINDOW 1
+#define SHOW_INVENTORY_BAR 1
 
 #endif
