@@ -2141,7 +2141,7 @@ int main(int argc, char **argv) {
 
                         int above = get_block_entry(hx, hy + 1, hz).w;
                         if (is_plant(above)) {
-                            set_block(hx, hy + 1, hz, 9, 0);
+                            set_block(hx, hy + 1, hz, 0, 0);
                         }
                     } else {
                         set_block(hx, hy, hz, hw, hb);
