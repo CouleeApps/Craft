@@ -744,6 +744,7 @@ void gen_chunk_buffer(Chunk *chunk) {
 
     Map *map = &chunk->map;
 
+    // first pass - populate blocks array
     MAP_FOR_EACH(map, e) {
         int x = e->x - ox;
         int y = e->y - oy;
@@ -752,6 +753,7 @@ void gen_chunk_buffer(Chunk *chunk) {
             blocks[x][y][z] = e->w;
     } END_MAP_FOR_EACH;
 
+    // second pass - count exposed faces
     int faces = 0;
     MAP_FOR_EACH(map, e) {
         if (e->w <= 0) {
@@ -785,6 +787,7 @@ void gen_chunk_buffer(Chunk *chunk) {
         return;
     }
 
+    // third pass - generate geometry
     GLfloat *data = malloc_faces(9, faces);
     int offset = 0;
     MAP_FOR_EACH(map, e) {
@@ -928,7 +931,24 @@ void ensure_chunks(float x, float y, float z, int force) {
 }
 
 void _set_block(int p, int q, int x, int y, int z, int w, int b) {
-    Chunk *chunk = find_chunk(p, q);
+    // TODO: remove this check after server data is cleaned up
+    int ok = 0;
+    for (int dx = -1; dx <= 1; dx++) {
+        for (int dz = -1; dz <= 1; dz++) {
+            if (chunked(x + dx) == p && chunked(z + dz) == q &&
+                chunked(x) == p - dx && chunked(z) == q - dz)
+            {
+                ok = 1;
+            }
+        }
+    }
+    if (!ok) {
+        printf("Invalid _set_block call: (%d, %d) (%d, %d, %d) %d\n",
+            p, q, x, y, z, w);
+        return;
+    }
+    // END TODO
+     Chunk *chunk = find_chunk(p, q);
     if (chunk) {
         Map *map = &chunk->map;
         MapEntry current = map_get_entry(map, x, y, z);
