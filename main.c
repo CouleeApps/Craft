@@ -2193,6 +2193,7 @@ int main(int argc, char **argv) {
 
     inventory.items = calloc(INVENTORY_ITEMS, sizeof(Item));
 
+    int next = 0;
     for (int item = 0; item < INVENTORY_ITEMS; item ++) {
         inventory.items[item].count = 0;
         inventory.items[item].w     = 0;
@@ -2210,6 +2211,14 @@ int main(int argc, char **argv) {
 
     int loaded = db_load_state(&x, &y, &z, &rx, &ry, &inventory);
     ensure_chunks(x, y, z, 1);
+
+    for (int item = 0; item < INVENTORY_ITEMS; item ++) {
+        if (CREATIVE_MODE && is_placeable(++next)) {
+            inventory.items[item].count = INVENTORY_UNLIMITED;
+            inventory.items[item].w = next;
+        }
+    }
+
     if (!loaded) {
         y = highest_block(x, z) + 2;
     }
@@ -2260,7 +2269,6 @@ int main(int argc, char **argv) {
         }
 
         // HANDLE MOVEMENT //
-        float vx = 0, vy = 0, vz = 0;
         int sz = 0;
         int sx = 0;
 
@@ -2290,6 +2298,9 @@ int main(int argc, char **argv) {
                 if (glfwGetKey(window, CRAFT_KEY_JUMP)) {
                     if (flying) {
                         vy = 1;
+                    }
+                    else if (dy == 0) {
+                        dy = 8;
                     }
                 }
                 if (glfwGetKey(window, CRAFT_KEY_XM)) {

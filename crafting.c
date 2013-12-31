@@ -64,7 +64,7 @@ void init_crafting() {
         "0  "
         "   "
         "   ",
-        NULL, Stone.id, 1};
+        NULL, Cement.id, 1};
     recipes[recipe_count].ids = calloc(1, sizeof(int));
     recipes[recipe_count].ids[0] = Cobblestone.id;
     recipe_count ++;
@@ -75,16 +75,16 @@ void init_crafting() {
         "   ",
         NULL, LightStone.id, 4};
     recipes[recipe_count].ids = calloc(1, sizeof(int));
-    recipes[recipe_count].ids[0] = Stone.id;
+    recipes[recipe_count].ids[0] = Cement.id;
     recipe_count ++;
     //-------------------------------------------------
     recipes[recipe_count] = (Recipe){
         "000"
         "   "
         "   ",
-        NULL, Stone.id, 3};
+        NULL, Cement.id, 3};
     recipes[recipe_count].ids = calloc(1, sizeof(int));
-    recipes[recipe_count].ids[0] = Cement.id;
+    recipes[recipe_count].ids[0] = Stone.id;
     recipe_count ++;
     //-------------------------------------------------
     recipes[recipe_count] = (Recipe){

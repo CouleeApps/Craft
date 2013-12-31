@@ -35,7 +35,7 @@ void create_world(Map *map, int p, int q) {
                             map_set(map, x, y - 1, z, Dirt.id * flag, 0);
                     }
                 } else
-                    map_set(map, x, y, z, Stone.id * flag, 0);
+                    map_set(map, x, y, z, Cement.id * flag, 0);
             }
             if (w == Grass.id) {
                 if (SHOW_PLANTS) {
