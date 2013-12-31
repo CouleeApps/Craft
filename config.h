@@ -38,11 +38,13 @@
 #define CRAFT_KEY_OBSERVE 'O'
 #define CRAFT_KEY_OBSERVE_INSET 'P'
 #define CRAFT_KEY_INVENTORY 'E'
-#define CRAFT_KEY_BLOCK_TYPE 'R'
+#define CRAFT_KEY_ITEM_NEXT 'R'
+#define CRAFT_KEY_ITEM_PREV 'T'
 #define CRAFT_KEY_ZOOM GLFW_KEY_LEFT_SHIFT
 #define CRAFT_KEY_ORTHO 'F'
 #define CRAFT_KEY_CHAT 't'
 #define CRAFT_KEY_COMMAND '/'
+#define CRAFT_KEY_SIGN '?'
 
 // keys for moving along axes
 #define CRAFT_KEY_XM 'Z'
@@ -69,7 +71,7 @@
 #define INVENTORY_UNLIMITED 0x7fffffff
 
 // creative
-#define CREATIVE_MODE 0
+#define CREATIVE_MODE 1
 
 // hide inventory things
 #define SHOW_CRAFT_SCREEN 1

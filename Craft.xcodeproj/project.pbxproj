@@ -66,6 +66,7 @@
 		B58A769E185EC32A00655BD9 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B58A769C185EC31A00655BD9 /* OpenGL.framework */; };
 		B58A769F185EC32F00655BD9 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B58A769A185EC31600655BD9 /* Cocoa.framework */; };
 		B58A76A1185EC34400655BD9 /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B58A76A0185EC34400655BD9 /* IOKit.framework */; };
+		B5D6256E18725DB400520749 /* sign.c in Sources */ = {isa = PBXBuildFile; fileRef = B5D6256C18725DB400520749 /* sign.c */; };
 		B5DD996C1866B54300634CC0 /* item.c in Sources */ = {isa = PBXBuildFile; fileRef = B5DD996B1866B54300634CC0 /* item.c */; };
 /* End PBXBuildFile section */
 
@@ -286,6 +287,8 @@
 		B58A769C185EC31A00655BD9 /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = System/Library/Frameworks/OpenGL.framework; sourceTree = SDKROOT; };
 		B58A76A0185EC34400655BD9 /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = System/Library/Frameworks/IOKit.framework; sourceTree = SDKROOT; };
 		B5A6109818641568000BBAB1 /* sky.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = sky.png; sourceTree = "<group>"; };
+		B5D6256C18725DB400520749 /* sign.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = sign.c; sourceTree = "<group>"; };
+		B5D6256D18725DB400520749 /* sign.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sign.h; sourceTree = "<group>"; };
 		B5DD996B1866B54300634CC0 /* item.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = item.c; sourceTree = "<group>"; };
 		B5DD996D1866B55000634CC0 /* item.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = item.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -653,6 +656,8 @@
 				B58A7616185EBF8100655BD9 /* matrix.h */,
 				B51E21A8186E1E1D00C1AEB0 /* ring.c */,
 				B51E21A9186E1E1D00C1AEB0 /* ring.h */,
+				B5D6256C18725DB400520749 /* sign.c */,
+				B5D6256D18725DB400520749 /* sign.h */,
 				B58A762A185EBF8100655BD9 /* util.c */,
 				B58A762B185EBF8100655BD9 /* util.h */,
 				B58A762C185EBF8100655BD9 /* world.c */,
@@ -914,6 +919,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B5D6256E18725DB400520749 /* sign.c in Sources */,
 				B51E21AB186E1E2F00C1AEB0 /* noise.c in Sources */,
 				B58A7649185EC12A00655BD9 /* main.c in Sources */,
 				B51C90111867FB9700432518 /* crafting.c in Sources */,

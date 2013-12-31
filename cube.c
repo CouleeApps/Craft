@@ -1,5 +1,6 @@
 #include <math.h>
 #include "cube.h"
+#include "item.h"
 #include "matrix.h"
 #include "item.h"
 #include "util.h"
@@ -12,8 +13,8 @@ void make_cube_faces(
 {
     float *d = data;
     float s = 0.0625;
-    float a = 0;
-    float b = s;
+    float a = 0 + 1 / 2048.0;
+    float b = s - 1 / 2048.0;
     float du, dv;
     int w;
     if (left) {
@@ -238,9 +239,9 @@ void make_plant(
     float a = 0;
     float b = s;
     float du, dv;
-    w--;
+    w = plants[w];
     du = (w % 16) * s;
-    dv = (w / 16 * 6) * s;
+    dv = (w / 16 * 2) * s;
     float x, y, z;
     x = y = z = 0;
     // left
@@ -440,19 +441,92 @@ void make_character(
     int w = c - 32;
     float du = (w % 16) * a;
     float dv = 1 - (w / 16) * b - b;
-    float p = 0;
     *(d++) = x - n; *(d++) = y - m;
-    *(d++) = du + 0; *(d++) = dv + p;
+    *(d++) = du + 0; *(d++) = dv;
     *(d++) = x + n; *(d++) = y - m;
-    *(d++) = du + a; *(d++) = dv + p;
+    *(d++) = du + a; *(d++) = dv;
     *(d++) = x + n; *(d++) = y + m;
-    *(d++) = du + a; *(d++) = dv + b - p;
+    *(d++) = du + a; *(d++) = dv + b;
     *(d++) = x - n; *(d++) = y - m;
-    *(d++) = du + 0; *(d++) = dv + p;
+    *(d++) = du + 0; *(d++) = dv;
     *(d++) = x + n; *(d++) = y + m;
-    *(d++) = du + a; *(d++) = dv + b - p;
+    *(d++) = du + a; *(d++) = dv + b;
     *(d++) = x - n; *(d++) = y + m;
-    *(d++) = du + 0; *(d++) = dv + b - p;
+    *(d++) = du + 0; *(d++) = dv + b;
+}
+
+void make_character_3d(
+    float *data,
+    float x, float y, float z, float n, float m, int face, char c)
+{
+    float *d = data;
+    float s = 0.0625;
+    float a = s;
+    float b = s * 2;
+    float p = 0.55;
+    int w = c - 32;
+    float du = (w % 16) * a;
+    float dv = 1 - (w / 16) * b - b;
+    if (face == 0) { // left
+        x -= p;
+        *(d++) = x; *(d++) = y - m; *(d++) = z - n;
+        *(d++) = du + 0; *(d++) = dv + 0;
+        *(d++) = x; *(d++) = y + m; *(d++) = z + n;
+        *(d++) = du + a; *(d++) = dv + b;
+        *(d++) = x; *(d++) = y + m; *(d++) = z - n;
+        *(d++) = du + 0; *(d++) = dv + b;
+        *(d++) = x; *(d++) = y - m; *(d++) = z - n;
+        *(d++) = du + 0; *(d++) = dv + 0;
+        *(d++) = x; *(d++) = y - m; *(d++) = z + n;
+        *(d++) = du + a; *(d++) = dv + 0;
+        *(d++) = x; *(d++) = y + m; *(d++) = z + n;
+        *(d++) = du + a; *(d++) = dv + b;
+    }
+    if (face == 1) { // right
+        x += p;
+        *(d++) = x; *(d++) = y - m; *(d++) = z - n;
+        *(d++) = du + a; *(d++) = dv + 0;
+        *(d++) = x; *(d++) = y + m; *(d++) = z + n;
+        *(d++) = du + 0; *(d++) = dv + b;
+        *(d++) = x; *(d++) = y - m; *(d++) = z + n;
+        *(d++) = du + 0; *(d++) = dv + 0;
+        *(d++) = x; *(d++) = y - m; *(d++) = z - n;
+        *(d++) = du + a; *(d++) = dv + 0;
+        *(d++) = x; *(d++) = y + m; *(d++) = z - n;
+        *(d++) = du + a; *(d++) = dv + b;
+        *(d++) = x; *(d++) = y + m; *(d++) = z + n;
+        *(d++) = du + 0; *(d++) = dv + b;
+    }
+    if (face == 2) { // front
+        z -= p;
+        *(d++) = x - n; *(d++) = y - m; *(d++) = z;
+        *(d++) = du + a; *(d++) = dv + 0;
+        *(d++) = x + n; *(d++) = y + m; *(d++) = z;
+        *(d++) = du + 0; *(d++) = dv + b;
+        *(d++) = x + n; *(d++) = y - m; *(d++) = z;
+        *(d++) = du + 0; *(d++) = dv + 0;
+        *(d++) = x - n; *(d++) = y - m; *(d++) = z;
+        *(d++) = du + a; *(d++) = dv + 0;
+        *(d++) = x - n; *(d++) = y + m; *(d++) = z;
+        *(d++) = du + a; *(d++) = dv + b;
+        *(d++) = x + n; *(d++) = y + m; *(d++) = z;
+        *(d++) = du + 0; *(d++) = dv + b;
+    }
+    if (face == 3) { // back
+        z += p;
+        *(d++) = x - n; *(d++) = y - m; *(d++) = z;
+        *(d++) = du + 0; *(d++) = dv + 0;
+        *(d++) = x + n; *(d++) = y - m; *(d++) = z;
+        *(d++) = du + a; *(d++) = dv + 0;
+        *(d++) = x + n; *(d++) = y + m; *(d++) = z;
+        *(d++) = du + a; *(d++) = dv + b;
+        *(d++) = x - n; *(d++) = y - m; *(d++) = z;
+        *(d++) = du + 0; *(d++) = dv + 0;
+        *(d++) = x + n; *(d++) = y + m; *(d++) = z;
+        *(d++) = du + a; *(d++) = dv + b;
+        *(d++) = x - n; *(d++) = y + m; *(d++) = z;
+        *(d++) = du + 0; *(d++) = dv + b;
+    }
 }
 
 int _make_sphere(

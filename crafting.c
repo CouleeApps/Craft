@@ -73,7 +73,7 @@ void init_crafting() {
         "00 "
         "00 "
         "   ",
-        NULL, LightSlab.id, 4};
+        NULL, LightStone.id, 4};
     recipes[recipe_count].ids = calloc(1, sizeof(int));
     recipes[recipe_count].ids[0] = Stone.id;
     recipe_count ++;
@@ -82,27 +82,27 @@ void init_crafting() {
         "000"
         "   "
         "   ",
-        NULL, Slab.id, 3};
+        NULL, Stone.id, 3};
     recipes[recipe_count].ids = calloc(1, sizeof(int));
-    recipes[recipe_count].ids[0] = Stone.id;
+    recipes[recipe_count].ids[0] = Cement.id;
     recipe_count ++;
     //-------------------------------------------------
     recipes[recipe_count] = (Recipe){
         "0  "
         "   "
         "   ",
-        NULL, DarkSlab.id, 1};
+        NULL, DarkStone.id, 1};
     recipes[recipe_count].ids = calloc(1, sizeof(int));
-    recipes[recipe_count].ids[0] = LightSlab.id;
+    recipes[recipe_count].ids[0] = LightStone.id;
     recipe_count ++;
     //-------------------------------------------------
     recipes[recipe_count] = (Recipe){
         "0  "
         "   "
         "   ",
-        NULL, LightSlab.id, 1};
+        NULL, LightStone.id, 1};
     recipes[recipe_count].ids = calloc(1, sizeof(int));
-    recipes[recipe_count].ids[0] = DarkSlab.id;
+    recipes[recipe_count].ids[0] = DarkStone.id;
     recipe_count ++;
     //-------------------------------------------------
     recipes[recipe_count] = (Recipe){
@@ -127,7 +127,7 @@ void init_crafting() {
         "000"
         "0 0"
         "000",
-        NULL, WoodBox.id, 8};
+        NULL, Chest.id, 8};
     recipes[recipe_count].ids = calloc(1, sizeof(int));
     recipes[recipe_count].ids[0] = Plank.id;
     recipe_count ++;
@@ -198,7 +198,7 @@ void init_crafting() {
         NULL, Grass.id, 3};
     recipes[recipe_count].ids = calloc(2, sizeof(int));
     recipes[recipe_count].ids[0] = Dirt.id;
-    recipes[recipe_count].ids[1] = Leaf.id;
+    recipes[recipe_count].ids[1] = Leaves.id;
     recipe_count ++;
     //-------------------------------------------------
     recipes[recipe_count] = (Recipe){

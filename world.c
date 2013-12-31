@@ -45,7 +45,7 @@ void create_world(Map *map, int p, int q) {
                     }
                 	// flowers
                		if (simplex2(x * 0.05, -z * 0.05, 4, 0.8, 2) > 0.7) {
-            	        int w = Flower1.id + simplex2(x * 0.1, z * 0.1, 4, 0.8, 2) * 7;
+            	        int w = YellowFlower.id + simplex2(x * 0.1, z * 0.1, 4, 0.8, 2) * 7;
             	        map_set(map, x, h, z, w * flag, 0);
             	    }
 				}
@@ -63,7 +63,7 @@ void create_world(Map *map, int p, int q) {
                                 int d = (ox * ox) + (oz * oz) +
                                     (y - (h + 4)) * (y - (h + 4));
                                 if (d < 11) {
-                                    map_set(map, x + ox, y, z + oz, Leaf.id, 0);
+                                    map_set(map, x + ox, y, z + oz, Leaves.id, 0);
                                 }
                             }
                         }

@@ -106,6 +106,15 @@ void client_block(int x, int y, int z, int w, int s) {
     }
 }
 
+void client_sign(int x, int y, int z, int face, const char *text) {
+    if (!client_enabled) {
+        return;
+    }
+    char buffer[1024];
+    snprintf(buffer, 1024, "S,%d,%d,%d,%d,%s\n", x, y, z, face, text);
+    client_send(buffer);
+}
+
 void client_talk(char *text) {
     if (!client_enabled) {
         return;
